@@ -1,23 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --bg-primary: #0f0d15;
-  --bg-secondary: #1a1625;
-  --bg-card: #211d2e;
-  --bg-card-hover: #2a2540;
-  --accent-primary: #c8956c;
-  --accent-secondary: #e8b98a;
-  --accent-gold: #d4a857;
-  --text-primary: #f5f0eb;
-  --text-secondary: #a39eb8;
-  --text-muted: #6b6580;
-  --success: #4ade80;
-  --warning: #fbbf24;
-  --danger: #f87171;
-  --info: #60a5fa;
-  --border-color: #2e2942;
-  --glass-bg: rgba(33, 29, 46, 0.7);
-  --glass-border: rgba(200, 149, 108, 0.15);
+  --bg-primary: #FBF3E8;        /* Blanco Crema / Leche de Avena */
+  --bg-secondary: #F3EAD8;      /* Crema un poco más oscuro */
+  --bg-card: #FFFFFF;           /* Tarjetas Blancas para contraste premium */
+  --bg-card-hover: #F8F0E2;     /* Tarjeta en hover */
+  --accent-primary: #8A6F57;    /* Beige Taupe */
+  --accent-secondary: #3B2B24;  /* Marrón café oscuro */
+  --accent-gold: #C2A388;       /* Beige dorado suave */
+  --text-primary: #3B2B24;      /* Marrón café oscuro para máxima legibilidad */
+  --text-secondary: #6B564C;    /* Café medio */
+  --text-muted: #8E7A6E;        /* Café claro apagado */
+  --success: #607C5B;           /* Verde oliva suave (plantas) */
+  --warning: #C08A5D;           /* Caramelo / warning */
+  --danger: #A64B4B;            /* Rojo suave / peligro */
+  --info: #6D8294;              /* Azul pastel / info */
+  --border-color: #E6DBC8;      /* Borde suave crema-marrón */
+  --glass-bg: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(138, 111, 87, 0.12);
 }
 
 @theme inline {
@@ -61,18 +61,20 @@ body {
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--glass-border);
   border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(59, 43, 36, 0.03);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-card:hover {
   border-color: var(--accent-primary);
-  box-shadow: 0 0 30px rgba(200, 149, 108, 0.08);
+  background: var(--bg-card);
+  box-shadow: 0 10px 30px rgba(138, 111, 87, 0.08);
 }
 
 /* Gradient Button */
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-  color: #0f0d15;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-gold));
+  color: #FFFFFF;
   font-weight: 600;
   padding: 0.625rem 1.5rem;
   border-radius: 12px;
@@ -80,11 +82,12 @@ body {
   border: none;
   cursor: pointer;
   font-size: 0.875rem;
+  box-shadow: 0 4px 12px rgba(138, 111, 87, 0.15);
 }
 
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 8px 25px rgba(200, 149, 108, 0.35);
+  box-shadow: 0 8px 20px rgba(138, 111, 87, 0.3);
 }
 
 .btn-primary:active {
@@ -101,15 +104,17 @@ body {
   transition: all 0.3s ease;
   cursor: pointer;
   font-size: 0.875rem;
+  box-shadow: 0 2px 6px rgba(59, 43, 36, 0.02);
 }
 
 .btn-secondary:hover {
   background: var(--bg-card-hover);
   border-color: var(--accent-primary);
+  color: var(--text-primary);
 }
 
 .btn-danger {
-  background: linear-gradient(135deg, #dc2626, #ef4444);
+  background: linear-gradient(135deg, #a64b4b, #bd5c5c);
   color: white;
   font-weight: 600;
   padding: 0.625rem 1.5rem;
@@ -118,15 +123,16 @@ body {
   cursor: pointer;
   font-size: 0.875rem;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(166, 75, 75, 0.15);
 }
 
 .btn-danger:hover {
-  box-shadow: 0 8px 25px rgba(220, 38, 38, 0.35);
+  box-shadow: 0 8px 20px rgba(166, 75, 75, 0.3);
 }
 
 /* Input styling */
 .input-field {
-  background: var(--bg-secondary);
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 12px;
   padding: 0.75rem 1rem;
@@ -135,16 +141,19 @@ body {
   width: 100%;
   transition: all 0.3s ease;
   outline: none;
+  box-shadow: inset 0 2px 4px rgba(59, 43, 36, 0.02);
 }
 
 .input-field:focus {
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px rgba(200, 149, 108, 0.15);
+  background: #FFFFFF;
+  box-shadow: 0 0 0 3px rgba(138, 111, 87, 0.15);
 }
 
 .input-field::placeholder {
   color: var(--text-muted);
 }
+
 
 /* Badge */
 .badge {
