@@ -1,0 +1,18 @@
+{
+  "name": "Charcas Capital",
+  "short_name": "CharcasCap",
+  "description": "Sistema ERP/POS - Cafetería Charcas Capital",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0d15",
+  "theme_color": "#c8956c",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
