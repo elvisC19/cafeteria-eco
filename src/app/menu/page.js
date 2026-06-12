@@ -38,7 +38,6 @@ export default function MenuPublicoPage() {
 
   const allCats = ['Todas', ...Object.keys(categorias)];
   
-  // Filter products based on active category AND search query
   const productosFiltrados = productos.filter(p => {
     const matchCat = categoriaActiva === 'Todas' || p.categoria === categoriaActiva;
     const matchSearch = p.nombre_producto.toLowerCase().includes(searchQuery.toLowerCase());
@@ -141,7 +140,7 @@ export default function MenuPublicoPage() {
   if (pedidoExitoso) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#FBF3E8] px-4 py-8 text-[#3B2B24]">
-        <div className="glass-card p-8 max-w-md w-full text-center animate-slide-up shadow-xl border-t-8 border-[#607C5B] relative bg-white">
+        <div className="glass-card shadow-neomorph-out p-8 max-w-md w-full text-center animate-slide-up border-t-8 border-[#607C5B] relative bg-white">
           <div className="w-16 h-16 bg-[#607C5B]/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-3xl text-[#607C5B]">✓</span>
           </div>
@@ -151,7 +150,7 @@ export default function MenuPublicoPage() {
           </h2>
           <p className="text-[#6B564C] text-sm mb-6">Su orden ha sido enviada directamente a la cocina.</p>
           
-          <div className="bg-[#F3EAD8] rounded-2xl p-5 mb-6 text-left border border-[#E6DBC8]">
+          <div className="bg-[#F3EAD8] rounded-2xl p-5 mb-6 text-left border border-[#E6DBC8] shadow-neomorph-in">
             <div className="flex justify-between items-center mb-3">
               <span className="text-xs text-[#8E7A6E] uppercase font-bold tracking-wider">Número de Pedido</span>
               <span className="text-xs font-bold px-2 py-0.5 rounded bg-[#607C5B]/20 text-[#607C5B]">
@@ -173,7 +172,7 @@ export default function MenuPublicoPage() {
 
           {/* QR Code Section */}
           {pedidoExitoso.metodo_pago === 'Pago QR Simple' && (
-            <div className="mb-6 p-4 bg-white rounded-2xl border border-[#E6DBC8] flex flex-col items-center">
+            <div className="mb-6 p-4 bg-white rounded-2xl border border-[#E6DBC8] flex flex-col items-center shadow-sm">
               <p className="text-xs font-semibold text-[#8E7A6E] mb-3">Escanee el código QR para pagar su orden</p>
               <div className="w-40 h-40 bg-neutral-100 p-2 rounded-xl flex items-center justify-center border border-dashed border-[#8A6F57] relative">
                 <svg className="w-36 h-36 text-[#3B2B24]" fill="currentColor" viewBox="0 0 24 24">
@@ -189,7 +188,7 @@ export default function MenuPublicoPage() {
             </div>
           )}
           
-          <button onClick={() => setPedidoExitoso(null)} className="btn-primary w-full py-3">
+          <button onClick={() => setPedidoExitoso(null)} className="btn-primary w-full py-3 shadow-neomorph-hover">
             Hacer Otro Pedido
           </button>
           <Link href="/" className="btn-secondary w-full mt-3 block text-center">
@@ -204,11 +203,11 @@ export default function MenuPublicoPage() {
     <div className="min-h-screen relative bg-[#FBF3E8] text-[#3B2B24] flex flex-col">
       {/* Sunlight decoration */}
       <div className="absolute top-0 right-0 w-2/3 h-80 bg-gradient-to-b from-white/60 to-transparent pointer-events-none z-0 filter blur-3xl" />
-      <div className="absolute top-12 left-4 text-4xl opacity-10 select-none animate-bounce" style={{ animationDuration: '6s' }}>🌿</div>
-      <div className="absolute top-96 right-4 text-4xl opacity-15 select-none animate-bounce" style={{ animationDuration: '7s' }}>🌱</div>
+      <div className="absolute top-12 left-4 text-4xl opacity-10 select-none animate-sway-slow pointer-events-none">🌿</div>
+      <div className="absolute top-96 right-4 text-4xl opacity-15 select-none animate-sway-slow pointer-events-none">🌱</div>
 
       {/* Header */}
-      <header className="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-[#E6DBC8] px-6 py-4 relative z-10">
+      <header className="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-[#E6DBC8] px-6 py-4 z-10 shadow-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#3B2B24] flex items-center justify-center text-lg font-bold text-[#FBF3E8] shadow-sm">
@@ -216,13 +215,13 @@ export default function MenuPublicoPage() {
             </div>
             <div>
               <h1 className="text-lg font-bold text-[#3B2B24]" style={{ fontFamily: 'var(--font-playfair), serif' }}>Charcas Capital</h1>
-              <p className="text-[10px] text-[#8A6F57] uppercase font-bold tracking-wider">Menú Digital Público</p>
+              <p className="text-[10px] text-[#8A6F57] uppercase font-bold tracking-wider">Menú Digital</p>
             </div>
           </Link>
 
           <button
             onClick={() => setShowCarrito(true)}
-            className="btn-primary relative flex items-center gap-2 text-xs py-2 px-4 shadow-sm"
+            className="btn-primary relative flex items-center gap-2 text-xs py-2 px-4 shadow-neomorph-hover"
           >
             🛒 Carrito
             {totalItems > 0 && (
@@ -246,12 +245,12 @@ export default function MenuPublicoPage() {
         </div>
       </section>
 
-      {/* Search and Category Pills Bar */}
-      <div className="sticky top-[73px] z-20 bg-white/85 backdrop-blur-md border-y border-[#E6DBC8] px-6 py-3">
+      {/* Search and Category Pills Bar (Z-pattern secondary scan point) */}
+      <div className="sticky top-[73px] z-20 bg-white/85 backdrop-blur-md border-y border-[#E6DBC8] px-6 py-3 shadow-sm">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
           
           {/* Categories Horizontal Scroller */}
-          <div className="flex gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0">
+          <div className="flex gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 scrollbar-none">
             {allCats.map(cat => (
               <button
                 key={cat}
@@ -267,11 +266,11 @@ export default function MenuPublicoPage() {
             ))}
           </div>
 
-          {/* Search bar */}
+          {/* Search bar (Neomorphic shadow in) */}
           <div className="relative w-full md:w-72">
             <input
               type="text"
-              className="input-field py-1.5 pl-9 pr-4 text-xs border-[#E6DBC8]"
+              className="input-field py-1.5 pl-9 pr-4 text-xs border-[#E6DBC8] shadow-neomorph-in"
               placeholder="Buscar producto..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -282,10 +281,10 @@ export default function MenuPublicoPage() {
         </div>
       </div>
 
-      {/* Products Grid */}
+      {/* Products Grid (Bento cards look for all items) */}
       <div className="max-w-7xl mx-auto px-6 py-8 flex-1 w-full z-10">
         {productosFiltrados.length === 0 ? (
-          <div className="glass-card p-12 text-center max-w-md mx-auto">
+          <div className="glass-card p-12 text-center max-w-md mx-auto shadow-neomorph-out">
             <span className="text-4xl block mb-2">🍃</span>
             <p className="text-sm font-semibold text-[#8E7A6E]">No hay productos en esta selección.</p>
           </div>
@@ -296,8 +295,7 @@ export default function MenuPublicoPage() {
               return (
                 <div
                   key={prod.id_producto}
-                  className="bg-white border border-[#E6DBC8]/80 hover:border-[#8A6F57] rounded-3xl p-5 flex flex-col justify-between transition-all duration-300 hover:shadow-md group"
-                  style={{ animationDelay: `${i * 0.04}s` }}
+                  className="bento-card p-5 flex flex-col justify-between group bg-white"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-4">
@@ -310,7 +308,7 @@ export default function MenuPublicoPage() {
                       {prod.nombre_producto}
                     </h3>
                     <p className="text-[11px] text-[#8E7A6E] leading-relaxed line-clamp-2 mb-4">
-                      Granos selectos e insumos frescos de primera calidad.
+                      Granos selectos e insumos frescos de primera calidad para una taza perfecta.
                     </p>
                   </div>
 
@@ -344,11 +342,11 @@ export default function MenuPublicoPage() {
         )}
       </div>
 
-      {/* Cart Drawer */}
+      {/* Cart Drawer Panel (Mobile responsive: 100% width) */}
       {showCarrito && (
         <div className="fixed inset-0 z-50">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setShowCarrito(false)} />
-          <div className="absolute right-0 top-0 bottom-0 w-full max-w-md bg-white border-l border-[#E6DBC8] flex flex-col animate-slide-up shadow-xl">
+          <div className="absolute right-0 top-0 bottom-0 w-full sm:max-w-md bg-white border-l border-[#E6DBC8] flex flex-col animate-slide-up shadow-2xl z-10">
             <div className="p-5 border-b border-[#E6DBC8] flex items-center justify-between bg-[#FBF3E8]">
               <h3 className="text-base font-bold text-[#3B2B24]">🛒 Mi Pedido Digital</h3>
               <button onClick={() => setShowCarrito(false)} className="p-1.5 rounded-full hover:bg-neutral-200 text-[#3B2B24] text-sm font-bold">
@@ -372,7 +370,7 @@ export default function MenuPublicoPage() {
                         onClick={() => setTipoServicio('Comer en el Lugar')}
                         className={`p-3 rounded-xl border text-left text-xs font-bold transition-all ${
                           tipoServicio === 'Comer en el Lugar'
-                            ? 'bg-[#3B2B24] border-[#3B2B24] text-white'
+                            ? 'bg-[#3B2B24] border-[#3B2B24] text-white shadow-sm'
                             : 'bg-white border-[#E6DBC8] text-[#3B2B24]'
                         }`}
                       >
@@ -382,7 +380,7 @@ export default function MenuPublicoPage() {
                         onClick={() => { setTipoServicio('Para Llevar / Recoger'); setNumeroMesa(''); }}
                         className={`p-3 rounded-xl border text-left text-xs font-bold transition-all ${
                           tipoServicio === 'Para Llevar / Recoger'
-                            ? 'bg-[#3B2B24] border-[#3B2B24] text-white'
+                            ? 'bg-[#3B2B24] border-[#3B2B24] text-white shadow-sm'
                             : 'bg-white border-[#E6DBC8] text-[#3B2B24]'
                         }`}
                       >
@@ -392,12 +390,12 @@ export default function MenuPublicoPage() {
                   </div>
 
                   {tipoServicio === 'Comer en el Lugar' && (
-                    <div className="bg-[#FBF3E8] rounded-xl p-4 border border-[#E6DBC8] animate-fade-in">
+                    <div className="bg-[#FBF3E8] rounded-xl p-4 border border-[#E6DBC8] animate-fade-in shadow-neomorph-in">
                       <label className="block text-xs font-bold text-[#8A6F57] uppercase tracking-wider mb-2">
                         🪑 Selecciona Mesa
                       </label>
                       <select
-                        className="input-field text-xs font-bold text-center border-[#E6DBC8]"
+                        className="input-field text-xs font-bold text-center border-[#E6DBC8] bg-white cursor-pointer"
                         value={numeroMesa}
                         onChange={(e) => setNumeroMesa(e.target.value)}
                       >
@@ -419,7 +417,7 @@ export default function MenuPublicoPage() {
                           onClick={() => setMetodoPago(met)}
                           className={`py-2 px-3 rounded-xl border text-xs font-semibold text-center transition-all ${
                             metodoPago === met
-                              ? 'bg-[#607C5B] border-[#607C5B] text-white'
+                              ? 'bg-[#607C5B] border-[#607C5B] text-white shadow-sm'
                               : 'bg-white border-[#E6DBC8] text-[#6B564C] hover:bg-[#F8F0E2]'
                           }`}
                         >
@@ -433,7 +431,7 @@ export default function MenuPublicoPage() {
                   <div className="space-y-3 pt-3 border-t border-[#E6DBC8]/40">
                     <p className="text-xs font-bold text-[#8A6F57] uppercase tracking-wider">Productos</p>
                     {carrito.map(item => (
-                      <div key={item.id_producto} className="bg-[#FBF3E8]/50 border border-[#E6DBC8] rounded-2xl p-4 space-y-2">
+                      <div key={item.id_producto} className="bg-[#FBF3E8]/50 border border-[#E6DBC8] rounded-2xl p-4 space-y-2 shadow-sm">
                         <div className="flex justify-between">
                           <div>
                             <p className="font-bold text-xs text-[#3B2B24]">{item.nombre_producto}</p>
@@ -446,7 +444,7 @@ export default function MenuPublicoPage() {
 
                         <input
                           type="text"
-                          className="text-[10px] bg-white border border-[#E6DBC8] rounded-lg px-2 py-1 text-[#3B2B24] w-full focus:outline-none"
+                          className="text-[10px] bg-white border border-[#E6DBC8] rounded-lg px-2 py-1.5 text-[#3B2B24] w-full focus:outline-none"
                           placeholder="Observaciones de preparación..."
                           value={item.observaciones || ''}
                           onChange={(e) => {
@@ -487,7 +485,7 @@ export default function MenuPublicoPage() {
                 <button
                   onClick={enviarPedido}
                   disabled={enviando || !tipoServicio || (tipoServicio === 'Comer en el Lugar' && !numeroMesa)}
-                  className="btn-primary w-full py-3 text-xs uppercase tracking-widest font-bold disabled:opacity-50"
+                  className="btn-primary w-full py-3 text-xs uppercase tracking-widest font-bold disabled:opacity-50 shadow-neomorph-hover"
                 >
                   {enviando ? 'Enviando orden...' : '📋 Confirmar Compra'}
                 </button>
@@ -498,7 +496,7 @@ export default function MenuPublicoPage() {
       )}
 
       {/* Footer */}
-      <footer className="text-center py-8 px-6 border-t border-[#E6DBC8] bg-white relative z-10">
+      <footer className="text-center py-8 px-6 border-t border-[#E6DBC8] bg-white relative z-10 mt-auto">
         <p className="text-xs font-semibold text-[#8E7A6E]">☕ Charcas Capital — Cafetería & Salón de Té</p>
         <p className="text-[10px] text-[#8E7A6E] mt-1">Chuquisaca, Bolivia • IND210 USFX</p>
       </footer>

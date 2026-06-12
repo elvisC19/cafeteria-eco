@@ -365,3 +365,66 @@ select.input-field {
 .numpad-btn:active {
   transform: scale(0.95);
 }
+
+/* ============================================================================
+   BENTO GRID & NEOMORFISMO SUAVE (SOFT SKEUOMORPHISM)
+   ============================================================================ */
+
+/* Sombras Neomórficas para elementos que flotan o sobresalen */
+.shadow-neomorph-out {
+  box-shadow: 
+    6px 6px 12px rgba(59, 43, 36, 0.05), 
+    -6px -6px 12px rgba(255, 255, 255, 0.95);
+}
+
+/* Sombras Neomórficas para campos de texto e inputs (hundidos) */
+.shadow-neomorph-in {
+  box-shadow: 
+    inset 3px 3px 6px rgba(59, 43, 36, 0.04), 
+    inset -3px -3px 6px rgba(255, 255, 255, 0.9);
+}
+
+/* Efecto hover neomórfico interactivo */
+.shadow-neomorph-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.shadow-neomorph-hover:hover {
+  box-shadow: 
+    10px 10px 20px rgba(59, 43, 36, 0.08), 
+    -10px -10px 20px rgba(255, 255, 255, 1);
+  transform: translateY(-2px);
+}
+
+/* Tarjetas Bento Grid */
+.bento-card {
+  background: #FFFFFF;
+  border-radius: 24px;
+  border: 1px solid rgba(138, 111, 87, 0.07);
+  box-shadow: 
+    6px 6px 12px rgba(59, 43, 36, 0.04), 
+    -6px -6px 12px rgba(255, 255, 255, 0.95);
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.bento-card:hover {
+  border-color: var(--accent-primary);
+  box-shadow: 
+    10px 10px 22px rgba(59, 43, 36, 0.08), 
+    -10px -10px 22px rgba(255, 255, 255, 1);
+  transform: translateY(-3px);
+}
+
+/* Animación de Balanceo y Efectos */
+@keyframes sway-slow {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(6deg); }
+}
+
+.animate-sway-slow {
+  animation: sway-slow 7s infinite ease-in-out;
+}
+
