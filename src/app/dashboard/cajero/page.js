@@ -128,8 +128,8 @@ export default function CajeroPage() {
 
       setSuccess(
         metodoPago === 'Efectivo'
-          ? `✅ Pago procesado. Cambio: Bs. ${pagoResult.pago.cambio}`
-          : `✅ Pago QR confirmado. Ref: ${pagoResult.pago.referencia_qr}`
+          ? `Pago procesado. Cambio: Bs. ${pagoResult.pago.cambio}`
+          : `Pago QR confirmado. Ref: ${pagoResult.pago.referencia_qr}`
       );
 
       // Reset
@@ -155,7 +155,7 @@ export default function CajeroPage() {
   }
 
   const mesasDisponibles = mesas.filter(m => m.estado === 'Disponible');
-  const catIcons = { 'Bebidas Calientes': '☕', 'Bebidas Frías': '🧊', 'Repostería': '🧁', 'Desayunos': '🍳', 'Meriendas': '🫖', 'Todas': '🍽️' };
+  // No icons needed for tabs
 
   if (loading) {
     return (
@@ -178,14 +178,20 @@ export default function CajeroPage() {
 
       {error && (
         <div className="mb-4 bg-[rgba(248,113,113,0.1)] border border-[var(--danger)] rounded-xl p-3 text-sm text-[var(--danger)] flex items-center gap-2">
-          ⚠️ {error}
-          <button onClick={() => setError('')} className="ml-auto text-xs">✕</button>
+          <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <span>{error}</span>
+          <button onClick={() => setError('')} className="ml-auto text-xs hover:opacity-75">✕</button>
         </div>
       )}
 
       {success && (
-        <div className="toast bg-[rgba(74,222,128,0.15)] border border-[var(--success)] text-[var(--success)]">
-          {success}
+        <div className="toast bg-[rgba(74,222,128,0.15)] border border-[var(--success)] text-[var(--success)] flex items-center gap-2">
+          <svg className="w-4 h-4 text-[var(--success)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+          <span>{success}</span>
         </div>
       )}
 
@@ -193,7 +199,12 @@ export default function CajeroPage() {
       {showPago && resultadoPago && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
           <div className="glass-card p-8 max-w-md w-full animate-slide-up">
-            <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2">💳 Procesar Pago</h3>
+            <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2 flex items-center gap-2">
+              <svg className="w-5 h-5 text-[var(--accent-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+              </svg>
+              <span>Procesar Pago</span>
+            </h3>
             <p className="text-sm text-[var(--text-secondary)] mb-6">
               Pedido #{resultadoPago.id_pedido} — Total: <span className="text-[var(--accent-secondary)] font-bold text-lg">Bs. {resultadoPago.total.toFixed(2)}</span>
             </p>
@@ -204,7 +215,11 @@ export default function CajeroPage() {
                   onClick={() => setMetodoPago('Efectivo')}
                   className="w-full p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] hover:border-[var(--success)] transition-colors text-left flex items-center gap-4"
                 >
-                  <span className="text-3xl">💵</span>
+                  <div className="w-10 h-10 rounded-lg bg-emerald-500/10 text-emerald-500 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </div>
                   <div>
                     <p className="font-semibold text-[var(--text-primary)]">Efectivo</p>
                     <p className="text-xs text-[var(--text-muted)]">Calcular cambio automáticamente</p>
@@ -214,7 +229,11 @@ export default function CajeroPage() {
                   onClick={() => setMetodoPago('Pago QR Simple')}
                   className="w-full p-4 rounded-xl bg-[var(--bg-secondary)] border border-[var(--border-color)] hover:border-[var(--info)] transition-colors text-left flex items-center gap-4"
                 >
-                  <span className="text-3xl">📱</span>
+                  <div className="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-500 flex items-center justify-center flex-shrink-0">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                  </div>
                   <div>
                     <p className="font-semibold text-[var(--text-primary)]">Pago QR Simple</p>
                     <p className="text-xs text-[var(--text-muted)]">Transferencia QR interbancaria</p>
@@ -269,7 +288,7 @@ export default function CajeroPage() {
 
                 <div className="flex gap-3">
                   <button onClick={procesarPago} disabled={procesando} className="btn-primary flex-1 py-3">
-                    {procesando ? 'Procesando...' : '✅ Confirmar Pago'}
+                    {procesando ? 'Procesando...' : 'Confirmar Pago'}
                   </button>
                   <button onClick={() => setMetodoPago('')} className="btn-secondary">Atrás</button>
                 </div>
@@ -301,7 +320,7 @@ export default function CajeroPage() {
                 <p className="text-sm text-[var(--text-secondary)]">Escanee el código QR para pagar</p>
                 <div className="flex gap-3">
                   <button onClick={procesarPago} disabled={procesando} className="btn-primary flex-1 py-3">
-                    {procesando ? 'Verificando...' : '✅ Confirmar Pago QR'}
+                    {procesando ? 'Verificando...' : 'Confirmar Pago QR'}
                   </button>
                   <button onClick={() => setMetodoPago('')} className="btn-secondary">Atrás</button>
                 </div>
@@ -317,21 +336,29 @@ export default function CajeroPage() {
           {/* Service type selector */}
           {!tipoServicio && (
             <div className="glass-card p-6">
-              <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-4">📌 Canal de Distribución</h3>
+              <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-4">Canal de Distribución</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
                   onClick={() => setTipoServicio('Comer en el Lugar')}
-                  className="p-5 rounded-xl bg-[var(--bg-secondary)] border-2 border-[var(--border-color)] hover:border-[var(--accent-primary)] transition-all text-left"
+                  className="p-5 rounded-xl bg-[var(--bg-secondary)] border-2 border-[var(--border-color)] hover:border-[var(--accent-primary)] transition-all text-left flex flex-col items-start"
                 >
-                  <span className="text-3xl mb-2 block">🪑</span>
+                  <div className="w-10 h-10 rounded-lg bg-[rgba(139,26,26,0.08)] text-[var(--color-cta)] flex items-center justify-center mb-3">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16" />
+                    </svg>
+                  </div>
                   <p className="font-semibold text-[var(--text-primary)]">Comer en el Lugar</p>
                   <p className="text-xs text-[var(--text-muted)] mt-1">Seleccionar mesa del salón</p>
                 </button>
                 <button
                   onClick={() => setTipoServicio('Para Llevar / Recoger')}
-                  className="p-5 rounded-xl bg-[var(--bg-secondary)] border-2 border-[var(--border-color)] hover:border-[var(--accent-primary)] transition-all text-left"
+                  className="p-5 rounded-xl bg-[var(--bg-secondary)] border-2 border-[var(--border-color)] hover:border-[var(--accent-primary)] transition-all text-left flex flex-col items-start"
                 >
-                  <span className="text-3xl mb-2 block">📦</span>
+                  <div className="w-10 h-10 rounded-lg bg-[rgba(139,26,26,0.08)] text-[var(--color-cta)] flex items-center justify-center mb-3">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                    </svg>
+                  </div>
                   <p className="font-semibold text-[var(--text-primary)]">Para Llevar / Recoger</p>
                   <p className="text-xs text-[var(--text-muted)] mt-1">Ticket de retiro automático</p>
                 </button>
@@ -342,7 +369,7 @@ export default function CajeroPage() {
           {/* Mesa selector */}
           {tipoServicio === 'Comer en el Lugar' && !mesaSeleccionada && (
             <div className="glass-card p-6">
-              <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-4">🪑 Seleccionar Mesa</h3>
+              <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-4">Seleccionar Mesa</h3>
               <div className="grid grid-cols-5 gap-3">
                 {mesas.map(mesa => (
                   <button
@@ -359,7 +386,9 @@ export default function CajeroPage() {
                   >
                     <p className="text-lg font-bold">{mesa.numero_mesa}</p>
                     <p className="text-xs opacity-70">{mesa.capacidad}p</p>
-                    <p className="text-xs mt-1">{mesa.estado === 'Disponible' ? '🟢' : '🔴'}</p>
+                    <div className="mt-1 flex items-center justify-center">
+                      <span className={`w-2 h-2 rounded-full ${mesa.estado === 'Disponible' ? 'bg-emerald-500' : 'bg-red-500'}`} />
+                    </div>
                   </button>
                 ))}
               </div>
@@ -380,7 +409,7 @@ export default function CajeroPage() {
                         : 'bg-[var(--bg-card)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                     }`}
                   >
-                    {catIcons[cat]} {cat}
+                    {cat}
                   </button>
                 ))}
               </div>
@@ -396,7 +425,9 @@ export default function CajeroPage() {
                       <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--bg-secondary)] text-[var(--text-muted)]">
                         {prod.categoria.split(' ')[0]}
                       </span>
-                      <span className="text-lg opacity-0 group-hover:opacity-100 transition-opacity">➕</span>
+                      <svg className="w-5 h-5 text-[var(--accent-primary)] opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
                     </div>
                     <p className="font-semibold text-sm text-[var(--text-primary)] mb-1 line-clamp-2">{prod.nombre_producto}</p>
                     <p className="text-[var(--accent-secondary)] font-bold">Bs. {parseFloat(prod.precio_venta).toFixed(2)}</p>
@@ -412,7 +443,7 @@ export default function CajeroPage() {
           <div className="glass-card p-5 sticky top-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-[var(--text-primary)] flex items-center gap-2">
-                🛒 Comanda
+                Comanda
               </h3>
               {tipoServicio && (
                 <span className="badge badge-info text-xs">
@@ -423,7 +454,9 @@ export default function CajeroPage() {
 
             {carrito.length === 0 ? (
               <div className="text-center py-8">
-                <span className="text-4xl block mb-3">🛍️</span>
+                <svg className="w-12 h-12 text-[var(--text-muted)] mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
                 <p className="text-sm text-[var(--text-muted)]">Comanda vacía</p>
                 <p className="text-xs text-[var(--text-muted)] mt-1">Agregue productos del menú</p>
               </div>
@@ -478,7 +511,7 @@ export default function CajeroPage() {
                   disabled={procesando || !tipoServicio}
                   className="btn-primary w-full py-3 text-base disabled:opacity-50"
                 >
-                  {procesando ? 'Procesando...' : '📋 Enviar Pedido'}
+                  {procesando ? 'Procesando...' : 'Enviar Pedido'}
                 </button>
               </div>
             )}
@@ -489,7 +522,7 @@ export default function CajeroPage() {
                 onClick={() => { setTipoServicio(''); setMesaSeleccionada(null); setCarrito([]); setObservaciones({}); }}
                 className="btn-secondary w-full mt-3 text-xs"
               >
-                🔄 Reiniciar Pedido
+                Reiniciar Pedido
               </button>
             )}
           </div>

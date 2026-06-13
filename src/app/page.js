@@ -137,42 +137,35 @@ export default function HomePage() {
   // Custom Loading Splash Screen
   if (loading) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#FBF3E8] text-[#3B2B24]">
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[var(--color-bg-card)] text-[var(--color-text-primary)] select-none">
         <div className="relative flex flex-col items-center">
           <div className="flex gap-2 mb-2 justify-center h-10 w-20 relative">
-            <div className="w-1 bg-[#8A6F57] rounded-full animate-steam-wave" style={{ animationDelay: '0.1s' }} />
-            <div className="w-1.5 bg-[#8A6F57] rounded-full animate-steam-wave-tall" style={{ animationDelay: '0.3s' }} />
-            <div className="w-1 bg-[#8A6F57] rounded-full animate-steam-wave" style={{ animationDelay: '0.5s' }} />
+            <div className="w-1 bg-[var(--color-text-muted)] rounded-full animate-steam-wave" style={{ animationDelay: '0.1s' }} />
+            <div className="w-1.5 bg-[var(--color-text-muted)] rounded-full animate-steam-wave-tall" style={{ animationDelay: '0.3s' }} />
+            <div className="w-1 bg-[var(--color-text-muted)] rounded-full animate-steam-wave" style={{ animationDelay: '0.5s' }} />
           </div>
 
-          <div className="relative w-24 h-20 bg-[#FFFFFF] border-4 border-[#3B2B24] rounded-b-3xl flex items-end overflow-hidden shadow-md">
-            <div className="w-full bg-[#3B2B24] animate-fill-coffee" style={{ height: '75%' }} />
+          <div className="relative w-24 h-20 bg-white border-4 border-[var(--color-text-primary)] rounded-b-3xl flex items-end overflow-hidden shadow-md">
+            <div className="w-full bg-[var(--color-text-primary)] animate-fill-coffee" style={{ height: '75%' }} />
             <div className="absolute top-1 left-2 w-2 h-10 bg-white/40 rounded-full blur-[1px]" />
           </div>
-          <div className="absolute right-[-14px] top-6 w-5 h-10 border-4 border-[#3B2B24] border-l-0 rounded-r-full" />
-          <div className="w-32 h-3 bg-[#3B2B24] rounded-full mt-2 shadow-sm" />
-
-          <div className="absolute -top-12 -left-12 opacity-80 animate-bounce" style={{ animationDuration: '3s' }}>
-            <span className="text-3xl">🌿</span>
-          </div>
-          <div className="absolute -bottom-8 -right-12 opacity-80 animate-bounce" style={{ animationDuration: '4s', animationDelay: '0.5s' }}>
-            <span className="text-2xl">🌱</span>
-          </div>
+          <div className="absolute right-[-14px] top-6 w-5 h-10 border-4 border-[var(--color-text-primary)] border-l-0 rounded-r-full" />
+          <div className="w-32 h-3 bg-[var(--color-text-primary)] rounded-full mt-2 shadow-sm" />
         </div>
 
         <div className="mt-16 text-center animate-pulse">
-          <h2 className="text-2xl font-bold tracking-widest text-[#3B2B24]" style={{ fontFamily: 'var(--font-playfair), serif' }}>
+          <h2 className="text-2xl font-bold tracking-widest text-[var(--color-text-primary)]" style={{ fontFamily: 'var(--font-serif)' }}>
             CHARCAS CAPITAL
           </h2>
-          <p className="text-xs text-[#8A6F57] uppercase tracking-widest mt-2 font-semibold">
+          <p className="text-xs text-[var(--color-cta)] uppercase tracking-widest mt-2 font-semibold">
             CAFÉ DE ESPECIALIDAD & REPOSTERÍA
           </p>
-          <div className="mt-8 flex items-center justify-center gap-1.5 text-xs text-[#6B564C]">
+          <div className="mt-8 flex items-center justify-center gap-1.5 text-xs text-[var(--color-text-secondary)] font-medium">
             <span>Moliendo granos selectos</span>
             <span className="flex gap-0.5">
-              <span className="w-1.5 h-1.5 bg-[#8A6F57] rounded-full animate-bounce" style={{ animationDelay: '0s' }} />
-              <span className="w-1.5 h-1.5 bg-[#8A6F57] rounded-full animate-bounce" style={{ animationDelay: '0.15s' }} />
-              <span className="w-1.5 h-1.5 bg-[#8A6F57] rounded-full animate-bounce" style={{ animationDelay: '0.3s' }} />
+              <span className="w-1.5 h-1.5 bg-[var(--color-cta)] rounded-full animate-bounce" style={{ animationDelay: '0s' }} />
+              <span className="w-1.5 h-1.5 bg-[var(--color-cta)] rounded-full animate-bounce" style={{ animationDelay: '0.15s' }} />
+              <span className="w-1.5 h-1.5 bg-[var(--color-cta)] rounded-full animate-bounce" style={{ animationDelay: '0.3s' }} />
             </span>
           </div>
         </div>
@@ -198,68 +191,81 @@ export default function HomePage() {
     );
   }
 
+  const renderCategoryIcon = (category) => {
+    if (category === 'Bebidas Calientes' || category === 'Bebidas Frías') {
+      return (
+        <svg className="w-5 h-5 text-[var(--color-cta)]" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M17 8h2a2 2 0 012 2v2a2 2 0 01-2 2h-2M3 8h14v7a4 4 0 01-4 4H7a4 4 0 01-4-4V8z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 3v2M10 3v2M14 3v2" />
+        </svg>
+      );
+    }
+    return (
+      <svg className="w-5 h-5 text-[var(--color-cta)]" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm-3 5a1.5 1.5 0 11-1.5 1.5A1.5 1.5 0 019 7zm6 2a1 1 0 11-1 1 1 1 0 011-1zm-4 4a1.5 1.5 0 11-1.5 1.5A1.5 1.5 0 0111 13zm4 2a1.5 1.5 0 11-1.5 1.5A1.5 1.5 0 0115 15z" />
+      </svg>
+    );
+  };
+
   // Success view with Receipt & Simulated QR
   if (pedidoExitoso) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FBF3E8] p-4 text-[#3B2B24]">
-        <div className="absolute top-4 left-4 text-6xl opacity-10 select-none">🌿</div>
-        <div className="absolute bottom-4 right-4 text-7xl opacity-10 select-none">🌱</div>
-
-        <div className="glass-card shadow-neomorph-out p-8 max-w-md w-full text-center animate-slide-up relative border-t-8 border-[#607C5B]">
-          <div className="w-16 h-16 bg-[#607C5B]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl text-[#607C5B]">✓</span>
+      <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg-card)] p-4 text-[var(--color-text-primary)] selection:bg-[var(--color-cta)] selection:text-white select-none">
+        <div className="bg-white border border-[var(--color-border-warm)] rounded-xl p-8 max-w-md w-full text-center animate-slide-up relative border-t-8 border-[var(--color-success)] shadow-lg">
+          <div className="w-16 h-16 bg-[rgba(61,107,71,0.08)] rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-3xl text-[var(--color-success)] font-bold">✓</span>
           </div>
           
-          <h2 className="text-2xl font-bold text-[#3B2B24] mb-2" style={{ fontFamily: 'var(--font-playfair), serif' }}>
+          <h2 className="text-2xl font-bold text-[var(--color-text-primary)] mb-2" style={{ fontFamily: 'var(--font-serif)' }}>
             ¡Pedido Enviado!
           </h2>
-          <p className="text-sm text-[#6B564C] mb-6">Tu orden se está preparando en la barra de especialidad.</p>
+          <p className="text-sm text-[var(--color-text-secondary)] mb-6 font-medium">Tu orden se está preparando en la barra de especialidad.</p>
 
-          <div className="bg-[#F3EAD8] rounded-2xl p-5 mb-6 text-left border border-[#E6DBC8] shadow-neomorph-in">
+          <div className="bg-[var(--color-bg-card)] border border-[var(--color-border-warm)] rounded-xl p-5 mb-6 text-left shadow-sm">
             <div className="flex justify-between items-center mb-3">
-              <span className="text-xs text-[#8E7A6E] uppercase font-bold tracking-wider">Número de Pedido</span>
-              <span className="text-xs font-bold px-2 py-1 rounded bg-[#607C5B]/20 text-[#607C5B]">
+              <span className="text-[11px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider">Canal de Entrega</span>
+              <span className="text-[10px] font-bold px-2 py-1 rounded bg-[var(--color-success)]/10 text-[var(--color-success)]">
                 {pedidoExitoso.tipo_servicio}
               </span>
             </div>
-            <p className="text-4xl font-extrabold text-[#3B2B24] tracking-tight">#{pedidoExitoso.id_pedido}</p>
+            <p className="text-4xl font-black text-[var(--color-text-primary)] tracking-tight">#{pedidoExitoso.id_pedido}</p>
             
-            <div className="border-t border-[#E6DBC8] my-3 pt-3 flex justify-between text-sm">
-              <span className="text-[#6B564C]">Mesa:</span>
-              <span className="font-bold">{pedidoExitoso.id_mesa ? `Mesa ${numeroMesa || pedidoExitoso.id_mesa}` : 'Para Llevar'}</span>
+            <div className="border-t border-[var(--color-border-warm)]/60 my-3 pt-3 flex justify-between text-sm">
+              <span className="text-[var(--color-text-secondary)] font-medium">Mesa:</span>
+              <span className="font-bold text-[var(--color-text-primary)]">{pedidoExitoso.id_mesa ? `Mesa ${numeroMesa || pedidoExitoso.id_mesa}` : 'Para Llevar'}</span>
             </div>
             
             <div className="flex justify-between text-sm">
-              <span className="text-[#6B564C]">Total a Pagar:</span>
-              <span className="font-bold text-[#3B2B24]">Bs. {parseFloat(pedidoExitoso.total_pago).toFixed(2)}</span>
+              <span className="text-[var(--color-text-secondary)] font-medium">Total a Pagar:</span>
+              <span className="font-bold text-[var(--color-text-primary)]">Bs. {parseFloat(pedidoExitoso.total_pago).toFixed(2)}</span>
             </div>
           </div>
 
           {pedidoExitoso.metodo_pago === 'Pago QR Simple' && (
-            <div className="mb-6 p-4 bg-white rounded-2xl border border-[#E6DBC8] flex flex-col items-center shadow-sm">
-              <p className="text-xs font-semibold text-[#8E7A6E] mb-3">Escanea el código QR para pagar su orden</p>
+            <div className="mb-6 p-4 bg-white rounded-xl border border-[var(--color-border-warm)] flex flex-col items-center shadow-sm">
+              <p className="text-xs font-semibold text-[var(--color-text-muted)] mb-3">Escanea el código QR para pagar su orden</p>
               
-              <div className="w-44 h-44 bg-neutral-100 p-2 rounded-xl flex items-center justify-center border border-dashed border-[#8A6F57] relative">
-                <svg className="w-40 h-40 text-[#3B2B24]" fill="currentColor" viewBox="0 0 24 24">
+              <div className="w-44 h-44 bg-neutral-100 p-2 rounded-xl flex items-center justify-center border border-dashed border-[var(--color-border-warm)] relative">
+                <svg className="w-40 h-40 text-[var(--color-text-primary)]" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 15h6v6H3v-6zm2 2v2h2v-2H5zm10 2h2v2h-2v-2zm2-2h2v2h-2v-2zm-2-2h2v2h-2v-2zm4 2h2v2h-2v-2zm-2-4h2v2h-2v-2zm-2 0h2v2h-2v-2zm-4-4h2v2h-2V7zm2 2h2v2h-2V9zm-4 2h2v2H9v-2zm6-6h2v2h-2V5zm-2 2h2v2h-2V7zm-2 2h2v2H9V9zm4 4h2v2h-2v-2zm-6 2h2v2H7v-2zm2 2h2v2H9v-2zm2-4h2v2h-2v-2zm2 2h2v2h-2v-2z" />
                 </svg>
-                <div className="absolute w-8 h-8 bg-white border border-[#E6DBC8] rounded-lg flex items-center justify-center">
-                  <span className="text-xs font-bold text-[#3B2B24]">CC</span>
+                <div className="absolute w-8 h-8 bg-white border border-[var(--color-border-warm)] rounded-lg flex items-center justify-center">
+                  <span className="text-xs font-bold text-[var(--color-text-primary)]">CC</span>
                 </div>
               </div>
               
-              <span className="text-[10px] text-[#607C5B] bg-[#607C5B]/10 px-2 py-0.5 rounded-full font-bold mt-2 animate-pulse">
+              <span className="text-[10px] text-[var(--color-success)] bg-[var(--color-success)]/10 px-2.5 py-0.5 rounded-full font-bold mt-3 animate-pulse">
                 Esperando confirmación bancaria
               </span>
             </div>
           )}
 
           <div className="space-y-2">
-            <button onClick={() => setPedidoExitoso(null)} className="btn-primary w-full py-3 shadow-neomorph-hover">
-              ☕ Realizar Nueva Compra
+            <button onClick={() => setPedidoExitoso(null)} className="btn-primary w-full py-3.5">
+              Realizar Nueva Compra
             </button>
             <Link href="/menu" className="btn-secondary w-full py-3 block text-center">
-              🎴 Ver Carta Completa
+              Ver Carta Completa
             </Link>
           </div>
         </div>
@@ -268,234 +274,246 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden bg-[#FBF3E8] text-[#3B2B24] selection:bg-[#8A6F57] selection:text-white">
+    <div className="min-h-screen flex flex-col relative bg-[var(--color-bg-card)] text-[var(--color-text-primary)] font-sans selection:bg-[var(--color-cta)] selection:text-white">
       
-      {/* Sunlight glow decoration */}
-      <div className="absolute top-0 right-0 w-full lg:w-2/3 h-[600px] bg-gradient-to-bl from-white via-white/40 to-transparent opacity-60 pointer-events-none z-0 transform origin-top-right rotate-12 filter blur-3xl" />
+      {/* 3.1 Barra Informativa Superior (NUEVA) */}
+      <div className="bg-[var(--color-bg-dark)] text-[var(--color-text-on-dark)] text-[12px] h-[40px] px-4 sm:px-8 lg:px-12 flex items-center justify-between border-b border-[var(--color-border-dark)] z-20 font-medium select-none">
+        <div className="flex items-center gap-1.5">
+          <span>Café de Especialidad — Sucre, Bolivia</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <span className="flex items-center gap-1">Telf: +591 64-51234</span>
+          <span className="hidden sm:inline opacity-40">|</span>
+          <span className="flex items-center gap-1">Horario: Lun–Sáb 07:30 a 21:30</span>
+        </div>
+      </div>
 
-      {/* Floating plant leaves (Organic decoration) */}
-      <div className="absolute top-28 left-[8%] opacity-15 select-none animate-sway-slow pointer-events-none text-4xl">🌿</div>
-      <div className="absolute top-[480px] right-[4%] opacity-20 select-none animate-sway-slow pointer-events-none text-3xl" style={{ animationDelay: '1.5s' }}>🌱</div>
-      <div className="absolute bottom-40 left-[4%] opacity-10 select-none animate-sway-slow pointer-events-none text-5xl" style={{ animationDelay: '3.5s' }}>🍃</div>
-
-      {/* 1. Header (La Cabecera - Standard Anatomical Structure, Z-Pattern Start) */}
-      <header className="relative z-10 border-b border-[#E6DBC8] bg-white/70 backdrop-blur-md sticky top-0 px-4 sm:px-8 lg:px-12 py-4 flex items-center justify-between">
-        {/* Z-Pattern Element 1: Logo & Brand (Top-Left) */}
+      {/* 3.2 Navbar Principal */}
+      <header className="z-30 border-b border-[var(--color-border-warm)] bg-[var(--color-bg-white)] sticky top-0 px-4 sm:px-8 lg:px-12 py-3.5 flex items-center justify-between shadow-sm">
+        {/* Logo izquierda */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#3B2B24] flex items-center justify-center text-lg font-bold text-[#FBF3E8] shadow-sm">
-            CC
-          </div>
+          <svg className="w-6 h-6 text-[var(--color-cta)]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M17 8h2a2 2 0 012 2v2a2 2 0 01-2 2h-2M3 8h14v7a4 4 0 01-4 4H7a4 4 0 01-4-4V8z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 3v2M10 3v2M14 3v2" />
+          </svg>
           <div>
-            <h1 className="text-base sm:text-lg font-bold tracking-tight text-[#3B2B24]" style={{ fontFamily: 'var(--font-playfair), serif' }}>
-              Charcas Capital
+            <h1 className="text-base sm:text-lg font-bold tracking-tight text-[var(--color-text-primary)]" style={{ fontFamily: 'var(--font-serif)' }}>
+              CHARCAS CAPITAL
             </h1>
-            <p className="text-[9px] font-semibold text-[#8A6F57] uppercase tracking-wider">Café de Especialidad</p>
+            <p className="text-[10px] font-semibold text-[var(--color-text-muted)] uppercase tracking-widest mt-0.5">CAFÉ DE ESPECIALIDAD</p>
           </div>
         </div>
         
-        {/* Z-Pattern Element 2: Navigation & Primary CTA (Top-Right) */}
-        <nav className="flex items-center gap-2 sm:gap-3">
-          <button 
-            onClick={() => {
-              const el = document.getElementById('catalogo');
-              el?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className="text-xs font-semibold text-[#3B2B24] hover:text-[#8A6F57] transition-colors cursor-pointer hidden sm:inline-block"
-          >
-            Nuestros Cafés
-          </button>
-          
-          <button
-            onClick={() => setShowCarrito(true)}
-            className="btn-secondary text-xs flex items-center gap-1.5 relative border-[#E6DBC8] shadow-sm"
-          >
-            🛒 <span className="hidden xs:inline">Carrito</span>
-            {totalItems > 0 && (
-              <span className="w-5 h-5 rounded-full bg-[#607C5B] text-white text-[10px] flex items-center justify-center font-bold absolute -top-2 -right-2 animate-bounce">
-                {totalItems}
-              </span>
-            )}
-          </button>
-
-          <Link href="/login" className="btn-primary text-xs py-2 px-3.5 shadow-neomorph-hover">
-            Ingresar
-          </Link>
-        </nav>
-      </header>
-
-      {/* 2. Zona Héroe (Hero Section - Z-Pattern Focal Flow & Clean Aesthetic) */}
-      <main className="relative z-10 flex-1 flex flex-col items-center">
-        
-        <section className="w-full max-w-6xl px-6 pt-16 pb-12 text-center flex flex-col items-center z-10">
-          <div className="inline-flex items-center gap-2 px-3 .shadow-neomorph-out py-1 rounded-full bg-[#607C5B]/10 border border-[#607C5B]/20 text-[#607C5B] text-xs font-medium mb-6">
-            <span>🌿 Amplitud, Luz Natural & Calidez</span>
-          </div>
-
-          {/* Hero Headline (Eye lands diagonal center) */}
-          <h2 className="text-4xl sm:text-6xl font-black text-[#3B2B24] leading-tight max-w-4xl tracking-tight" style={{ fontFamily: 'var(--font-playfair), serif' }}>
-            Un oasis de tranquilidad y <br className="hidden md:inline"/>
-            <span className="text-[#8A6F57] italic font-serif font-normal">café de especialidad</span>
-          </h2>
-
-          <p className="text-[#6B564C] max-w-xl text-sm sm:text-base mt-6 leading-relaxed">
-            Descubre nuestro menú digital diseñado con la pulcritud y sofisticación de las mejores cafeterías. Realiza tu pedido en línea de forma rápida, segura y disfruta en un entorno iluminado.
-          </p>
-
-          {/* Hero CTA Action (Z-Pattern final action point) */}
-          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center w-full max-w-md">
+        {/* Links de navegación y acciones */}
+        <nav className="flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-8">
             <button 
               onClick={() => {
                 const el = document.getElementById('catalogo');
                 el?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="btn-primary py-3 px-8 text-xs uppercase tracking-wider font-bold shadow-neomorph-hover flex items-center justify-center gap-2"
+              className="text-sm font-semibold text-[var(--color-text-primary)] hover:text-[var(--color-cta)] transition-colors cursor-pointer"
             >
-              🌱 Ordenar Menú Digital
+              Menú Digital
             </button>
             <button 
               onClick={() => {
-                const el = document.getElementById('espacio-bento');
+                const el = document.getElementById('destacados');
                 el?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="btn-secondary py-3 px-8 text-xs uppercase tracking-wider font-bold border-[#E6DBC8] flex items-center justify-center gap-2"
+              className="text-sm font-semibold text-[var(--color-text-primary)] hover:text-[var(--color-cta)] transition-colors cursor-pointer"
             >
-              ☀️ Conocer el Espacio
+              Destacados
             </button>
           </div>
-        </section>
+          
+          <div className="flex items-center gap-6">
+            {/* Ícono carrito */}
+            <button
+              onClick={() => setShowCarrito(true)}
+              className="text-[var(--color-text-primary)] hover:text-[var(--color-cta)] transition-colors relative cursor-pointer"
+              title="Ver Carrito"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              {totalItems > 0 && (
+                <span className="w-5 h-5 rounded-full bg-[var(--color-cta)] text-white text-[10px] flex items-center justify-center font-bold absolute -top-2 -right-2 animate-bounce">
+                  {totalItems}
+                </span>
+              )}
+            </button>
 
-        {/* 3. El Cuerpo (Body/Content - Bento Grid & Soft Neomorphism Layout) */}
+            {/* Botón Ingresar */}
+            <Link href="/login" className="btn-primary">
+              Ingresar
+            </Link>
+          </div>
+        </nav>
+      </header>
+
+      {/* 3.3 Hero — Fotografía de Fondo a Pantalla Completa */}
+      <section className="relative w-full min-h-[88vh] flex items-center justify-start bg-[var(--color-bg-dark)] overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="/hero_coffee_bg.png" 
+            alt="Charcas Capital Cafetería" 
+            className="w-full h-full object-cover object-center"
+            onError={(e) => {
+              // Fallback to dark gradient if image fails
+              e.target.style.display = 'none';
+              e.target.parentNode.style.background = 'linear-gradient(135deg, #1A0A05 0%, #3B1000 100%)';
+            }}
+          />
+        </div>
         
-        {/* Bento Grid Section */}
-        <section id="espacio-bento" className="w-full max-w-6xl px-6 py-12">
-          <div className="mb-8 text-center sm:text-left">
-            <span className="text-xs font-bold text-[#607C5B] uppercase tracking-widest block">Nuestra Identidad</span>
-            <h3 className="text-2xl sm:text-3xl font-extrabold text-[#3B2B24]" style={{ fontFamily: 'var(--font-playfair), serif' }}>
-              Concepto Charcas Capital
-            </h3>
-            <p className="text-xs text-[#8E7A6E] mt-1">Organización visual inspirada en la sencillez y el orden Bento</p>
-          </div>
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-[var(--color-bg-overlay)] z-10" />
 
-          {/* Bento Grid Container (CSS Grid 2D) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Content */}
+        <div className="relative z-20 w-full max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 py-20 flex flex-col items-start text-left">
+          <span className="text-[13px] font-semibold uppercase tracking-[0.15em] text-white/70 mb-4 block">
+            Sucre, Bolivia
+          </span>
+
+          <h2 className="text-4xl sm:text-6xl font-black text-[var(--color-text-on-dark)] leading-tight max-w-3xl tracking-tight" style={{ fontFamily: 'var(--font-serif)' }}>
+            Un Oasis de Tranquilidad y <br/>
+            Café de Especialidad
+          </h2>
+
+          <p className="text-white/80 max-w-xl text-base sm:text-lg mt-6 leading-relaxed">
+            Descubre nuestro menú digital diseñado con la pulcritud y sofisticación de las mejores cafeterías. Realiza tu pedido en línea de forma rápida, segura y disfruta de nuestro espacio.
+          </p>
+
+          <div className="mt-10 flex flex-row gap-4 w-full max-w-md">
+            <button 
+              onClick={() => {
+                const el = document.getElementById('catalogo');
+                el?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="btn-primary py-3.5 px-7 text-xs uppercase tracking-wider font-bold cursor-pointer"
+            >
+              Ordenar Ahora
+            </button>
+            <button 
+              onClick={() => {
+                const el = document.getElementById('destacados');
+                el?.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="btn-secondary py-3.5 px-7 text-xs uppercase tracking-wider font-bold border-white/50 text-white hover:bg-white/10 hover:border-white cursor-pointer"
+            >
+              Conocer el Espacio
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* 3.4 Sección de Destacados (Debajo del Hero) */}
+      <section id="destacados" className="w-full bg-[var(--color-bg-card)] py-16 border-b border-[var(--color-border-warm)]">
+        <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             
-            {/* Bento Box 1: Large Featured Coffee Card (Col-span 2 on medium+) */}
-            <div className="bento-card md:col-span-2 flex flex-col justify-between bg-gradient-to-br from-white to-[#FBF3E8] min-h-[280px]">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-[#8A6F57]/5 rounded-bl-full pointer-events-none" />
-              <div>
-                <span className="text-xs font-bold text-[#607C5B] bg-[#607C5B]/10 px-2.5 py-1 rounded-full uppercase tracking-wider">Plato Destacado de la Semana</span>
-                <h4 className="text-2xl font-black text-[#3B2B24] mt-4" style={{ fontFamily: 'var(--font-playfair), serif' }}>
-                  Cappuccino Clásico de Altura
-                </h4>
-                <p className="text-xs text-[#6B564C] mt-2 max-w-md leading-relaxed">
-                  Preparado con café molido arábica seleccionado de los valles chuquisaqueños, leche emulsionada a la temperatura perfecta y un toque sutil de cacao orgánico en polvo.
-                </p>
+            {/* Columna 1: Cappuccino */}
+            <div className="flex flex-col items-center text-center p-6 bg-white rounded-xl shadow-sm md:border-r md:border-[var(--color-border-warm)] md:rounded-none md:bg-transparent md:shadow-none">
+              <div className="mb-4">
+                <svg className="w-12 h-12 text-[var(--color-cta)]" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 8h2a2 2 0 012 2v2a2 2 0 01-2 2h-2M3 8h14v7a4 4 0 01-4 4H7a4 4 0 01-4-4V8z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 3v2M10 3v2M14 3v2" />
+                </svg>
               </div>
-              <div className="flex items-end justify-between mt-6 border-t border-[#E6DBC8]/40 pt-4">
-                <div>
-                  <span className="text-[10px] text-[#8E7A6E] block font-bold uppercase">Precio Especial</span>
-                  <span className="text-xl font-black text-[#3B2B24]">Bs. 18.00</span>
-                </div>
-                <button
-                  onClick={() => {
-                    const cappuccino = productos.find(p => p.nombre_producto.includes('Cappuccino'));
-                    if (cappuccino) {
-                      addToCart(cappuccino);
-                      setShowCarrito(true);
-                    } else {
-                      const el = document.getElementById('catalogo');
-                      el?.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }}
-                  className="btn-primary py-2.5 px-5 text-xs shadow-neomorph-hover"
-                >
-                  + Agregar al Pedido
-                </button>
-              </div>
+              <h4 className="font-bold text-[15px] uppercase tracking-[0.08em] text-[var(--color-text-primary)] mb-2">
+                Cappuccino Clásico
+              </h4>
+              <p className="text-sm text-[var(--color-text-secondary)] mb-6 max-w-xs leading-relaxed">
+                Delicioso café espresso con leche emulsionada y una fina capa de espuma de cacao.
+              </p>
+              <button 
+                onClick={() => handleOrderFeatured('Cappuccino')}
+                className="mt-auto bg-[var(--color-cta)] hover:bg-[var(--color-cta-hover)] text-white font-bold text-[12px] uppercase py-2.5 px-5 rounded-[4px] transition-colors cursor-pointer"
+              >
+                ORDENAR AHORA
+              </button>
             </div>
 
-            {/* Bento Box 2: Atmosphere & Plant Concept (1 Col vertical) */}
-            <div className="bento-card bg-white flex flex-col justify-between min-h-[280px]">
-              <div>
-                <div className="w-10 h-10 rounded-xl bg-[#607C5B]/15 flex items-center justify-center text-xl text-[#607C5B] mb-4">
-                  🌿
-                </div>
-                <h4 className="text-lg font-bold text-[#3B2B24]" style={{ fontFamily: 'var(--font-playfair), serif' }}>
-                  Luz & Vegetación
-                </h4>
-                <p className="text-xs text-[#6B564C] mt-2 leading-relaxed">
-                  Espacios de arquitectura abierta y vegetación interior que garantizan frescura, tranquilidad y pulcritud para tus sentidos.
-                </p>
+            {/* Columna 2: Café Negro */}
+            <div className="flex flex-col items-center text-center p-6 bg-white rounded-xl shadow-sm md:border-r md:border-[var(--color-border-warm)] md:rounded-none md:bg-transparent md:shadow-none">
+              <div className="mb-4">
+                <svg className="w-12 h-12 text-[var(--color-cta)]" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c4.97 0 9 4.03 9 9s-4.03 9-9 9-9-4.03-9-9 4.03-9 9-9zm0 0c-2 2-3 5-1 9s5 3 7 1" />
+                </svg>
               </div>
-              <div className="text-xs text-[#8A6F57] font-semibold border-t border-[#E6DBC8]/40 pt-4 flex items-center gap-1">
-                <span>Espacio Pet & Eco Friendly</span>
-                <span className="animate-pulse">●</span>
-              </div>
+              <h4 className="font-bold text-[15px] uppercase tracking-[0.08em] text-[var(--color-text-primary)] mb-2">
+                Café Negro
+              </h4>
+              <p className="text-sm text-[var(--color-text-secondary)] mb-6 max-w-xs leading-relaxed">
+                Extracción pura de granos selectos tostados artesanalmente con notas cítricas y dulces.
+              </p>
+              <button 
+                onClick={() => handleOrderFeatured('Negro')}
+                className="mt-auto bg-[var(--color-cta)] hover:bg-[var(--color-cta-hover)] text-white font-bold text-[12px] uppercase py-2.5 px-5 rounded-[4px] transition-colors cursor-pointer"
+              >
+                ORDENAR AHORA
+              </button>
             </div>
 
-            {/* Bento Box 3: Technical Metrics (Small card, 1 col) */}
-            <div className="bento-card bg-white flex flex-col justify-between min-h-[160px]">
-              <div>
-                <span className="text-2xl">⚡</span>
-                <h4 className="text-sm font-bold text-[#3B2B24] mt-2">Conexión Premium</h4>
-                <p className="text-[11px] text-[#6B564C] mt-1">
-                  Wifi simétrico de fibra óptica en todo el salón para teletrabajo y estudio cómodo.
-                </p>
+            {/* Columna 3: Cookies */}
+            <div className="flex flex-col items-center text-center p-6 bg-white rounded-xl shadow-sm md:rounded-none md:bg-transparent md:shadow-none">
+              <div className="mb-4">
+                <svg className="w-12 h-12 text-[var(--color-cta)]" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm-3 5a1.5 1.5 0 11-1.5 1.5A1.5 1.5 0 019 7zm6 2a1 1 0 11-1 1 1 1 0 011-1zm-4 4a1.5 1.5 0 11-1.5 1.5A1.5 1.5 0 0111 13zm4 2a1.5 1.5 0 11-1.5 1.5A1.5 1.5 0 0115 15z" />
+                </svg>
               </div>
-              <span className="text-[10px] text-[#8E7A6E] font-bold uppercase tracking-wider block">Zona Cowork</span>
-            </div>
-
-            {/* Bento Box 4: Quality Bean Metric (Small card, 1 col) */}
-            <div className="bento-card bg-[#3B2B24] text-white flex flex-col justify-between min-h-[160px]">
-              <div>
-                <span className="text-2xl">☕</span>
-                <h4 className="text-sm font-bold text-[#FBF3E8] mt-2">100% Granos Arábica</h4>
-                <p className="text-[11px] text-[#F3EAD8]/80 mt-1">
-                  Granos cosechados de forma responsable y tostados artesanalmente.
-                </p>
-              </div>
-              <span className="text-[10px] text-[#C2A388] font-bold uppercase tracking-wider block">Café de Altura</span>
-            </div>
-
-            {/* Bento Box 5: Happy Customers Metric (Small card, 1 col) */}
-            <div className="bento-card bg-white flex flex-col justify-between min-h-[160px]">
-              <div>
-                <span className="text-2xl text-[#607C5B]">★</span>
-                <h4 className="text-sm font-bold text-[#3B2B24] mt-2">Calificación 4.9</h4>
-                <p className="text-[11px] text-[#6B564C] mt-1">
-                  Reconocidos por la pulcritud de nuestro servicio y la sofisticación del sabor.
-                </p>
-              </div>
-              <span className="text-[10px] text-[#8E7A6E] font-bold uppercase tracking-wider block">Opiniones Reales</span>
+              <h4 className="font-bold text-[15px] uppercase tracking-[0.08em] text-[var(--color-text-primary)] mb-2">
+                Repostería Fina
+              </h4>
+              <p className="text-sm text-[var(--color-text-secondary)] mb-6 max-w-xs leading-relaxed">
+                Horneada diariamente con chocolate belga semi-amargo y un toque de sal marina.
+              </p>
+              <button 
+                onClick={() => handleOrderFeatured('Galleta')}
+                className="mt-auto bg-[var(--color-cta)] hover:bg-[var(--color-cta-hover)] text-white font-bold text-[12px] uppercase py-2.5 px-5 rounded-[4px] transition-colors cursor-pointer"
+              >
+                ORDENAR AHORA
+              </button>
             </div>
 
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* E-commerce Storefront (Grid Layout & Responsive Catalog) */}
-        <section id="catalogo" className="w-full max-w-6xl px-6 py-12 border-t border-[#E6DBC8]/60 z-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+      {/* 3.5 Sección Menú Digital */}
+      <section id="catalogo" className="w-full bg-[var(--color-bg-white)] py-20 z-10">
+        <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
+          
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
             <div>
-              <h3 className="text-2xl font-bold tracking-tight text-[#3B2B24]" style={{ fontFamily: 'var(--font-playfair), serif' }}>
-                Nuestra Selección de Especialidad
+              <span className="text-[11px] font-bold text-[var(--color-cta)] uppercase tracking-[0.12em] block">
+                NUESTRA SELECCIÓN DE ESPECIALIDAD
+              </span>
+              <h3 className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--color-text-primary)] mt-1.5" style={{ fontFamily: 'var(--font-serif)' }}>
+                Carta Digital
               </h3>
-              <p className="text-xs text-[#8A6F57] font-medium mt-0.5">Explora el menú digital y realiza tu pedido al instante</p>
             </div>
 
-            {/* Live Search Bar (Neomorphic Shadow Inset) */}
+            {/* Barra de búsqueda */}
             <div className="relative w-full md:w-80">
               <input
                 type="text"
-                className="input-field pl-10 pr-4 py-2 border-[#E6DBC8] shadow-neomorph-in"
+                className="input-field pl-10 pr-10 py-3 bg-[var(--color-bg-card)] border-[var(--color-border-warm)] rounded-lg focus:border-[var(--color-cta)] focus:bg-[var(--color-bg-white)]"
                 placeholder="Buscar tu café o postre favorito..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <span className="absolute left-3.5 top-3.5 text-xs text-[#8E7A6E]">🔍</span>
+              <span className="absolute left-3.5 top-3.5 text-[var(--color-text-muted)]">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </span>
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3.5 top-3 text-xs text-[#A64B4B] font-bold"
+                  className="absolute right-3.5 top-3.5 text-xs text-[var(--color-danger)] font-bold cursor-pointer"
                 >
                   ✕
                 </button>
@@ -503,82 +521,86 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Category Scroller pills (Flexbox layout) */}
-          <div className="flex gap-2 overflow-x-auto pb-4 mb-8 border-b border-[#E6DBC8]/40 scrollbar-none">
+          {/* Categorías (Tabs de Categoría) */}
+          <div className="flex gap-2 overflow-x-auto pb-4 mb-10 border-b border-[var(--color-border-warm)]/60 scrollbar-none">
             {allCats.map(cat => (
               <button
                 key={cat}
                 onClick={() => setCategoriaActiva(cat)}
-                className={`flex-shrink-0 px-4 py-2 rounded-xl text-xs font-semibold transition-all border ${
+                className={`flex-shrink-0 px-4 py-2 text-xs font-semibold transition-all cursor-pointer ${
                   categoriaActiva === cat
-                    ? 'bg-[#3B2B24] border-[#3B2B24] text-white shadow-sm'
-                    : 'bg-white border-[#E6DBC8] text-[#6B564C] hover:bg-[#F8F0E2]'
+                    ? 'bg-[var(--color-cta)] text-white rounded-[4px] shadow-sm'
+                    : 'bg-transparent text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]'
                 }`}
               >
-                {catEmojis[cat] || '🍽️'} {cat}
+                {cat}
               </button>
             ))}
           </div>
 
-          {/* Product Items Responsive CSS Grid Layout */}
+          {/* Tarjetas de Producto */}
           {productosFiltrados.length === 0 ? (
-            <div className="bg-white/50 border border-[#E6DBC8] rounded-3xl p-12 text-center shadow-neomorph-out">
-              <span className="text-4xl block mb-2 animate-bounce">🍃</span>
-              <p className="text-sm font-semibold text-[#8E7A6E]">No encontramos productos que coincidan con la búsqueda.</p>
-              <button onClick={() => { setSearchQuery(''); setCategoriaActiva('Todas'); }} className="text-xs font-bold text-[#607C5B] mt-2 underline">
+            <div className="bg-[var(--color-bg-card)] border border-[var(--color-border-warm)] rounded-xl p-12 text-center">
+              <span className="text-4xl block mb-2">
+                <svg className="w-12 h-12 text-[var(--color-text-muted)] mx-auto" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </span>
+              <p className="text-sm font-semibold text-[var(--color-text-muted)] mt-4">No encontramos productos que coincidan con la búsqueda.</p>
+              <button onClick={() => { setSearchQuery(''); setCategoriaActiva('Todas'); }} className="text-xs font-bold text-[var(--color-cta)] mt-3 underline cursor-pointer">
                 Ver todos los productos
               </button>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {productosFiltrados.map((prod, i) => {
+              {productosFiltrados.map((prod) => {
                 const inCart = carrito.find(c => c.id_producto === prod.id_producto);
                 return (
                   <div
                     key={prod.id_producto}
-                    className="bento-card p-5 flex flex-col justify-between group bg-white"
+                    className="bg-white border border-[var(--color-border-warm)] rounded-xl p-5 flex flex-col justify-between group hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200"
                   >
                     <div>
                       {/* Product Header */}
                       <div className="flex justify-between items-start mb-4">
-                        <span className="text-3xl p-2 bg-[#FBF3E8] rounded-2xl group-hover:scale-110 transition-transform">
-                          {catEmojis[prod.categoria] || '☕'}
+                        <span className="p-2.5 bg-[var(--color-bg-card)] rounded-xl group-hover:scale-105 transition-transform duration-200">
+                          {renderCategoryIcon(prod.categoria)}
                         </span>
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${catColors[prod.categoria] || 'bg-stone-100 text-stone-800'}`}>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-[var(--color-border-warm)] bg-[var(--color-bg-card)] text-[var(--color-text-secondary)]">
                           {prod.categoria}
                         </span>
                       </div>
                       
-                      {/* Product Body */}
-                      <h4 className="font-bold text-base text-[#3B2B24] mb-1 group-hover:text-[#8A6F57] transition-colors">
+                      {/* Product Name */}
+                      <h4 className="font-bold text-base text-[var(--color-text-primary)] mb-1 group-hover:text-[var(--color-cta)] transition-colors">
                         {prod.nombre_producto}
                       </h4>
-                      <p className="text-xs text-[#8E7A6E] line-clamp-2 leading-relaxed mb-4">
-                        Ingredientes selectos y preparación sofisticada. Café de especialidad.
+                      <p className="text-xs text-[var(--color-text-muted)] line-clamp-2 leading-relaxed mb-5">
+                        Ingredientes selectos y preparación sofisticada. Café de especialidad premium.
                       </p>
                     </div>
 
                     {/* Product Footer */}
-                    <div className="border-t border-[#FBF3E8] pt-4 flex items-center justify-between mt-auto">
-                      <div>
-                        <span className="text-[10px] text-[#8E7A6E] block font-bold uppercase tracking-wider">Precio</span>
-                        <span className="text-base font-extrabold text-[#3B2B24]">
+                    <div className="border-t border-[var(--color-border-warm)]/40 pt-4 flex flex-col gap-3 mt-auto">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] text-[var(--color-text-muted)] block font-bold uppercase tracking-wider">Precio</span>
+                        <span className="text-lg font-bold text-[var(--color-gold)]" style={{ fontFamily: 'var(--font-serif)' }}>
                           Bs. {parseFloat(prod.precio_venta).toFixed(2)}
                         </span>
                       </div>
 
                       {inCart ? (
-                        <div className="flex items-center gap-1 bg-[#FBF3E8] rounded-xl p-1 border border-[#E6DBC8]">
+                        <div className="flex items-center justify-between bg-[var(--color-bg-card)] rounded-lg p-1 border border-[var(--color-border-warm)]">
                           <button
                             onClick={() => updateQty(prod.id_producto, -1)}
-                            className="w-7 h-7 rounded-lg bg-white text-xs font-bold text-[#A64B4B] hover:bg-neutral-100 flex items-center justify-center transition-colors"
+                            className="w-7 h-7 rounded-md bg-white text-xs font-bold text-[var(--color-cta)] hover:bg-neutral-100 flex items-center justify-center transition-colors cursor-pointer"
                           >
                             -
                           </button>
-                          <span className="font-bold text-xs w-6 text-center text-[#3B2B24]">{inCart.qty}</span>
+                          <span className="font-bold text-xs text-[var(--color-text-primary)]">{inCart.qty}</span>
                           <button
                             onClick={() => updateQty(prod.id_producto, 1)}
-                            className="w-7 h-7 rounded-lg bg-white text-xs font-bold text-[#607C5B] hover:bg-neutral-100 flex items-center justify-center transition-colors"
+                            className="w-7 h-7 rounded-md bg-white text-xs font-bold text-[var(--color-success)] hover:bg-neutral-100 flex items-center justify-center transition-colors cursor-pointer"
                           >
                             +
                           </button>
@@ -586,9 +608,9 @@ export default function HomePage() {
                       ) : (
                         <button
                           onClick={() => addToCart(prod)}
-                          className="bg-[#3B2B24] hover:bg-[#8A6F57] text-white text-xs font-bold py-2.5 px-4 rounded-xl transition-colors shadow-sm"
+                          className="bg-[var(--color-cta)] hover:bg-[var(--color-cta-hover)] text-white text-xs font-bold py-2.5 rounded-md transition-colors cursor-pointer w-full"
                         >
-                          + Añadir
+                          + Agregar
                         </button>
                       )}
                     </div>
@@ -597,24 +619,31 @@ export default function HomePage() {
               })}
             </div>
           )}
-        </section>
+        </div>
+      </section>
 
-      </main>
-
-      {/* 4. Pie de Página (Footer - Standard Anatomical Section) */}
-      <footer className="relative z-10 border-t border-[#E6DBC8] py-8 text-center bg-white px-6">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-xs mb-4">
-          <div className="text-left">
-            <p className="font-bold text-[#3B2B24]">📍 Sucursal Central</p>
-            <p className="text-[#8E7A6E] mt-0.5">Calle España esq. Junín, Chuquisaca, Bolivia</p>
+      {/* 3.6 Footer */}
+      <footer className="relative z-10 border-t border-[var(--color-border-dark)] py-12 bg-[var(--color-bg-dark)] px-6 sm:px-8 lg:px-12 text-[var(--color-text-on-dark)]">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-start gap-8 text-xs mb-8">
+          <div className="text-left max-w-sm">
+            <h4 className="text-base font-bold text-[var(--color-text-on-dark)] tracking-wider mb-2" style={{ fontFamily: 'var(--font-serif)' }}>
+              CHARCAS CAPITAL
+            </h4>
+            <p className="text-white/55 leading-relaxed">
+              Café de especialidad en Sucre, ofreciendo un entorno premium de tranquilidad, luz natural y alta calidad en cada grano de café.
+            </p>
           </div>
-          <div className="text-right md:text-right text-center">
-            <p className="font-bold text-[#3B2B24]">🕒 Horarios de Atención</p>
-            <p className="text-[#8E7A6E] mt-0.5">Lunes a Sábado: 07:30 - 21:30</p>
+          <div className="text-left">
+            <p className="font-bold text-[var(--color-text-on-dark)] mb-2">Sucursal Central</p>
+            <p className="text-white/55">Calle España esq. Junín, Sucre, Bolivia</p>
+          </div>
+          <div className="text-left">
+            <p className="font-bold text-[var(--color-text-on-dark)] mb-2">Horarios de Atención</p>
+            <p className="text-white/55">Lunes a Sábado: 07:30 - 21:30</p>
           </div>
         </div>
-        <div className="border-t border-[#E6DBC8]/40 pt-6">
-          <p className="text-[10px] text-[#8E7A6E]">
+        <div className="max-w-6xl mx-auto border-t border-[var(--color-border-dark)] pt-8 text-center text-white/35">
+          <p className="text-[12px] leading-relaxed">
             Universidad Mayor Real y Pontificia de San Francisco Xavier de Chuquisaca
             <br />
             Materia IND210 — Ingeniería Económica © 2026. Todos los derechos reservados.
@@ -622,73 +651,76 @@ export default function HomePage() {
         </div>
       </footer>
 
-      {/* Responsive Cart Drawer Panel (Mobile: 100% full screen / Desktop: Slide-out panel) */}
+      {/* Cart Drawer Panel */}
       {showCarrito && (
-        <div className="fixed inset-0 z-50">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setShowCarrito(false)} />
-          {/* Responsive Drawer width container */}
-          <div className="absolute right-0 top-0 bottom-0 w-full sm:max-w-md bg-white border-l border-[#E6DBC8] flex flex-col animate-slide-up shadow-2xl z-10">
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" onClick={() => setShowCarrito(false)} />
+          <div className="relative w-full sm:max-w-md bg-white border-l border-[var(--color-border-warm)] flex flex-col animate-slide-up shadow-2xl h-full z-10">
             
             {/* Drawer Header */}
-            <div className="p-5 border-b border-[#E6DBC8] flex items-center justify-between bg-[#FBF3E8]">
+            <div className="p-5 border-b border-[var(--color-border-warm)] flex items-center justify-between bg-[var(--color-bg-card)]">
               <div className="flex items-center gap-2">
-                <span className="text-xl">🛍️</span>
-                <h3 className="text-lg font-bold text-[#3B2B24]">Mi Orden</h3>
+                <svg className="w-5 h-5 text-[var(--color-cta)]" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                <h3 className="text-lg font-bold text-[var(--color-text-primary)]">Mi Orden</h3>
               </div>
               <button 
                 onClick={() => setShowCarrito(false)} 
-                className="w-8 h-8 rounded-full hover:bg-[#3B2B24]/10 flex items-center justify-center text-[#3B2B24] transition-colors text-lg"
+                className="w-8 h-8 rounded-full hover:bg-[var(--color-text-primary)]/10 flex items-center justify-center text-[var(--color-text-primary)] transition-colors text-lg cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
             {/* Drawer Body */}
-            <div className="flex-1 overflow-y-auto p-5 space-y-5">
+            <div className="flex-1 overflow-y-auto p-5 space-y-6 bg-white">
               {carrito.length === 0 ? (
                 <div className="text-center py-16">
-                  <span className="text-6xl block mb-4 animate-bounce">☕</span>
-                  <p className="text-sm font-semibold text-[#8E7A6E]">Tu carrito está vacío</p>
-                  <p className="text-xs text-[#8E7A6E] mt-1">Explora nuestros productos y agrega tus favoritos.</p>
+                  <svg className="w-16 h-16 text-[var(--color-text-muted)] mx-auto mb-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                  </svg>
+                  <p className="text-sm font-semibold text-[var(--color-text-muted)]">Tu carrito está vacío</p>
+                  <p className="text-xs text-[var(--color-text-muted)] mt-1">Explora nuestros productos y agrega tus favoritos.</p>
                 </div>
               ) : (
                 <>
                   {/* Service Selection */}
                   <div className="space-y-3">
-                    <p className="text-xs font-bold text-[#8A6F57] uppercase tracking-wider">📌 Canal de entrega</p>
+                    <p className="text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider">Canal de entrega</p>
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         onClick={() => { setTipoServicio('Comer en el Lugar'); setError(''); }}
-                        className={`p-3 rounded-2xl border text-left transition-all font-bold text-xs ${
+                        className={`p-3 rounded-lg border text-left transition-all font-bold text-xs cursor-pointer flex items-center gap-2 justify-center ${
                           tipoServicio === 'Comer en el Lugar'
-                            ? 'bg-[#3B2B24] border-[#3B2B24] text-white shadow-sm'
-                            : 'bg-white border-[#E6DBC8] text-[#3B2B24] hover:bg-[#F8F0E2]'
+                            ? 'bg-[var(--color-cta)] border-[var(--color-cta)] text-white shadow-sm'
+                            : 'bg-white border-[var(--color-border-warm)] text-[var(--color-text-primary)] hover:bg-[var(--color-bg-card)]'
                         }`}
                       >
-                        🪑 En el Lugar
+                        En el Lugar
                       </button>
 
                       <button
                         onClick={() => { setTipoServicio('Para Llevar / Recoger'); setError(''); }}
-                        className={`p-3 rounded-2xl border text-left transition-all font-bold text-xs ${
+                        className={`p-3 rounded-lg border text-left transition-all font-bold text-xs cursor-pointer flex items-center gap-2 justify-center ${
                           tipoServicio === 'Para Llevar / Recoger'
-                            ? 'bg-[#3B2B24] border-[#3B2B24] text-white shadow-sm'
-                            : 'bg-white border-[#E6DBC8] text-[#3B2B24] hover:bg-[#F8F0E2]'
+                            ? 'bg-[var(--color-cta)] border-[var(--color-cta)] text-white shadow-sm'
+                            : 'bg-white border-[var(--color-border-warm)] text-[var(--color-text-primary)] hover:bg-[var(--color-bg-card)]'
                         }`}
                       >
-                        📦 Para Llevar
+                        Para Llevar
                       </button>
                     </div>
                   </div>
 
                   {/* Mesa Selection */}
                   {tipoServicio === 'Comer en el Lugar' && (
-                    <div className="bg-[#FBF3E8] rounded-2xl p-4 border border-[#E6DBC8] animate-fade-in shadow-neomorph-in">
-                      <label className="block text-xs font-bold text-[#8A6F57] uppercase tracking-wider mb-2">
-                        🪑 Seleccione su Número de Mesa
+                    <div className="bg-[var(--color-bg-card)] rounded-xl p-4 border border-[var(--color-border-warm)] animate-fade-in">
+                      <label className="block text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider mb-2">
+                        Seleccione su Número de Mesa
                       </label>
                       <select
-                        className="input-field text-center text-sm font-bold border-[#E6DBC8] bg-white cursor-pointer"
+                        className="input-field text-center text-sm font-bold border-[var(--color-border-warm)] bg-white cursor-pointer"
                         value={numeroMesa}
                         onChange={(e) => { setNumeroMesa(e.target.value); setError(''); }}
                       >
@@ -702,42 +734,42 @@ export default function HomePage() {
 
                   {/* Payment Method selection */}
                   <div className="space-y-2">
-                    <p className="text-xs font-bold text-[#8A6F57] uppercase tracking-wider">💳 Método de Pago</p>
+                    <p className="text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider">Método de Pago</p>
                     <div className="grid grid-cols-2 gap-2">
                       {['Efectivo', 'Pago QR Simple'].map(met => (
                         <button
                           key={met}
                           onClick={() => setMetodoPago(met)}
-                          className={`py-2 px-3 rounded-xl border text-xs font-semibold text-center transition-all ${
+                          className={`py-2.5 px-3 rounded-lg border text-xs font-semibold text-center transition-all cursor-pointer ${
                             metodoPago === met
-                              ? 'bg-[#607C5B] border-[#607C5B] text-white'
-                              : 'bg-white border-[#E6DBC8] text-[#6B564C] hover:bg-[#F8F0E2]'
+                              ? 'bg-[var(--color-success)] border-[var(--color-success)] text-white shadow-sm'
+                              : 'bg-white border-[var(--color-border-warm)] text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-card)]'
                           }`}
                         >
-                          {met === 'Pago QR Simple' ? '📱 QR Simple' : '💵 Efectivo'}
+                          {met === 'Pago QR Simple' ? 'QR Simple' : 'Efectivo'}
                         </button>
                       ))}
                     </div>
                   </div>
 
                   {/* Cart Items List */}
-                  <div className="space-y-3 pt-4 border-t border-[#E6DBC8]/60">
-                    <p className="text-xs font-bold text-[#8A6F57] uppercase tracking-wider">Productos en Carrito</p>
+                  <div className="space-y-3 pt-4 border-t border-[var(--color-border-warm)]/60">
+                    <p className="text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider">Productos en Carrito</p>
                     {carrito.map(item => (
-                      <div key={item.id_producto} className="bg-[#FBF3E8]/60 border border-[#E6DBC8] rounded-2xl p-4 flex flex-col justify-between gap-3 shadow-sm">
+                      <div key={item.id_producto} className="bg-[var(--color-bg-card)] border border-[var(--color-border-warm)] rounded-xl p-4 flex flex-col justify-between gap-3 shadow-sm">
                         <div className="flex justify-between items-start">
                           <div>
-                            <p className="font-bold text-xs text-[#3B2B24]">{item.nombre_producto}</p>
-                            <p className="text-[10px] text-[#8E7A6E]">Bs. {parseFloat(item.precio_venta).toFixed(2)} c/u</p>
+                            <p className="font-bold text-xs text-[var(--color-text-primary)]">{item.nombre_producto}</p>
+                            <p className="text-[10px] text-[var(--color-text-muted)] mt-0.5">Bs. {parseFloat(item.precio_venta).toFixed(2)} c/u</p>
                           </div>
-                          <p className="text-xs font-extrabold text-[#3B2B24]">
+                          <p className="text-xs font-extrabold text-[var(--color-text-primary)]">
                             Bs. {(parseFloat(item.precio_venta) * item.qty).toFixed(2)}
                           </p>
                         </div>
                         
                         <input
                           type="text"
-                          className="text-[10px] bg-white border border-[#E6DBC8] rounded-lg px-2.5 py-1.5 text-[#3B2B24] placeholder:text-[#8E7A6E]/60 focus:outline-[#8A6F57]"
+                          className="text-[10px] bg-white border border-[var(--color-border-warm)] rounded-lg px-2.5 py-1.5 text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)]/60 focus:outline-[var(--color-cta)]"
                           placeholder="Observaciones de preparación..."
                           value={item.observaciones || ''}
                           onChange={(e) => {
@@ -746,16 +778,16 @@ export default function HomePage() {
                           }}
                         />
 
-                        <div className="flex items-center justify-between border-t border-[#E6DBC8]/40 pt-2">
-                          <div className="flex items-center gap-1.5 bg-white rounded-lg p-0.5 border border-[#E6DBC8]">
-                            <button onClick={() => updateQty(item.id_producto, -1)} className="w-6 h-6 rounded bg-neutral-50 text-xs font-bold text-[#A64B4B] flex items-center justify-center">-</button>
-                            <span className="font-bold text-xs w-5 text-center text-[#3B2B24]">{item.qty}</span>
-                            <button onClick={() => updateQty(item.id_producto, 1)} className="w-6 h-6 rounded bg-neutral-50 text-xs font-bold text-[#607C5B] flex items-center justify-center">+</button>
+                        <div className="flex items-center justify-between border-t border-[var(--color-border-warm)]/40 pt-2">
+                          <div className="flex items-center gap-1.5 bg-white rounded-lg p-0.5 border border-[var(--color-border-warm)]">
+                            <button onClick={() => updateQty(item.id_producto, -1)} className="w-6 h-6 rounded bg-neutral-50 text-xs font-bold text-[var(--color-cta)] flex items-center justify-center cursor-pointer">-</button>
+                            <span className="font-bold text-xs w-5 text-center text-[var(--color-text-primary)]">{item.qty}</span>
+                            <button onClick={() => updateQty(item.id_producto, 1)} className="w-6 h-6 rounded bg-neutral-50 text-xs font-bold text-[var(--color-success)] flex items-center justify-center cursor-pointer">+</button>
                           </div>
                           
                           <button 
                             onClick={() => setCarrito(prev => prev.filter(i => i.id_producto !== item.id_producto))} 
-                            className="text-[10px] font-bold text-[#A64B4B] hover:underline"
+                            className="text-[10px] font-bold text-[var(--color-danger)] hover:underline cursor-pointer"
                           >
                             Eliminar
                           </button>
@@ -769,19 +801,19 @@ export default function HomePage() {
 
             {/* Drawer Sticky Footer */}
             {carrito.length > 0 && (
-              <div className="p-5 border-t border-[#E6DBC8] bg-[#FBF3E8]">
+              <div className="p-5 border-t border-[var(--color-border-warm)] bg-[var(--color-bg-card)]">
                 {error && (
-                  <p className="text-xs font-semibold text-[#A64B4B] bg-[#A64B4B]/10 p-2.5 rounded-xl mb-3 border border-[#A64B4B]/20">
-                    ⚠️ {error}
+                  <p className="text-xs font-semibold text-[var(--color-danger)] bg-[var(--color-danger)]/5 p-2.5 rounded-lg mb-3 border border-[var(--color-danger)]/20">
+                    {error}
                   </p>
                 )}
                 
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <span className="text-xs text-[#8E7A6E] font-medium block">Monto Total</span>
-                    <span className="text-2xl font-black text-[#3B2B24]">Bs. {total.toFixed(2)}</span>
+                    <span className="text-xs text-[var(--color-text-muted)] font-medium block">Monto Total</span>
+                    <span className="text-2xl font-bold text-[var(--color-text-primary)]">Bs. {total.toFixed(2)}</span>
                   </div>
-                  <span className="text-xs bg-[#607C5B]/15 text-[#607C5B] border border-[#607C5B]/30 px-3 py-1.5 rounded-xl font-bold">
+                  <span className="text-xs bg-[var(--color-success)]/10 text-[var(--color-success)] border border-[var(--color-success)]/20 px-3 py-1.5 rounded-lg font-bold">
                     {totalItems} Ítems
                   </span>
                 </div>
@@ -789,9 +821,9 @@ export default function HomePage() {
                 <button
                   onClick={enviarPedido}
                   disabled={enviando || !tipoServicio || (tipoServicio === 'Comer en el Lugar' && !numeroMesa)}
-                  className="btn-primary w-full py-3.5 text-xs font-bold tracking-widest uppercase disabled:opacity-50 shadow-neomorph-hover"
+                  className="btn-primary w-full py-3.5 text-xs font-bold tracking-widest uppercase disabled:opacity-50 cursor-pointer"
                 >
-                  {enviando ? 'Procesando pedido...' : '📋 Confirmar & Pedir'}
+                  {enviando ? 'Procesando pedido...' : 'Confirmar & Pedir'}
                 </button>
               </div>
             )}
@@ -799,16 +831,15 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Floating Cart Button for mobile checkout comfort */}
+      {/* Floating Cart Button */}
       {totalItems > 0 && !showCarrito && (
         <button
           onClick={() => setShowCarrito(true)}
-          className="fixed bottom-6 right-6 z-40 bg-[#3B2B24] hover:bg-[#8A6F57] text-white py-3.5 px-5 shadow-2xl flex items-center gap-3 rounded-2xl border border-white/20 transition-all scale-100 hover:scale-105 active:scale-95"
+          className="fixed bottom-6 right-6 z-40 bg-[var(--color-cta)] hover:bg-[var(--color-cta-hover)] text-white py-3.5 px-6 shadow-2xl flex items-center gap-3 rounded-xl border border-white/20 transition-all scale-100 hover:scale-105 active:scale-95 cursor-pointer font-bold text-xs uppercase"
         >
-          <span>🛒</span>
-          <span className="font-bold text-xs">{totalItems} Cafés</span>
+          <span>Ver Carrito ({totalItems})</span>
           <span className="opacity-40">|</span>
-          <span className="font-bold text-xs text-[#C2A388]">Bs. {total.toFixed(2)}</span>
+          <span className="text-[var(--color-gold-light)]">Bs. {total.toFixed(2)}</span>
         </button>
       )}
     </div>

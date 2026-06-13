@@ -86,7 +86,7 @@ export default function CocinaPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-playfair)' }}>
-            {usuario?.rol === 'Barista' ? '☕ Cola de Barismo' : usuario?.rol === 'Cocina' ? '🍳 Cola de Cocina' : '📋 Cola de Pedidos'}
+            {usuario?.rol === 'Barista' ? 'Cola de Barismo' : usuario?.rol === 'Cocina' ? 'Cola de Cocina' : 'Cola de Pedidos'}
           </h1>
           <p className="text-sm text-[var(--text-secondary)] mt-1">
             FIFO — {totalEnCola} pedidos activos en total • Auto-refresh cada 5 segundos
@@ -110,7 +110,7 @@ export default function CocinaPage() {
               : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
           }`}
         >
-          🗂️ Ver Todo
+          Ver Todo
         </button>
         <button
           onClick={() => setFiltroCategoria('Bebidas')}
@@ -120,7 +120,7 @@ export default function CocinaPage() {
               : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
           }`}
         >
-          ☕ Barismo (Bebidas)
+          Barismo (Bebidas)
         </button>
         <button
           onClick={() => setFiltroCategoria('Comida')}
@@ -130,21 +130,25 @@ export default function CocinaPage() {
               : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
           }`}
         >
-          🍳 Cocina (Comida)
+          Cocina (Comida)
         </button>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4">
         <div className="glass-card p-4 flex items-center gap-4 border-l-4 border-[var(--warning)]">
-          <span className="text-3xl">⏳</span>
+          <svg className="w-8 h-8 text-[var(--warning)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
           <div>
             <p className="text-2xl font-bold text-[var(--warning)]">{pendientes.length}</p>
             <p className="text-sm text-[var(--text-muted)]">Pendientes</p>
           </div>
         </div>
         <div className="glass-card p-4 flex items-center gap-4 border-l-4 border-[var(--info)]">
-          <span className="text-3xl">👨‍🍳</span>
+          <svg className="w-8 h-8 text-[var(--info)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+          </svg>
           <div>
             <p className="text-2xl font-bold text-[var(--info)]">{enPreparacion.length}</p>
             <p className="text-sm text-[var(--text-muted)]">En Preparación</p>
@@ -154,7 +158,9 @@ export default function CocinaPage() {
 
       {colaFiltrada.length === 0 ? (
         <div className="glass-card p-12 text-center">
-          <span className="text-5xl block mb-4">✅</span>
+          <svg className="w-16 h-16 text-emerald-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
           <p className="text-lg font-semibold text-[var(--text-primary)]">Cola vacía</p>
           <p className="text-sm text-[var(--text-muted)]">No hay pedidos pendientes para este sector</p>
         </div>
@@ -168,46 +174,77 @@ export default function CocinaPage() {
             return (
               <div
                 key={pedido.id_pedido}
-                className={`glass-card p-5 border-l-4 ${
-                  isPendiente
-                    ? isUrgente ? 'border-[var(--danger)] animate-pulse-danger' : 'border-[var(--warning)]'
-                    : 'border-[var(--info)]'
+                className={`border border-[var(--color-border-warm)] p-5 rounded-xl border-l-4 ${
+                  isUrgente ? 'border-l-[var(--color-cta)] bg-[#FFF8F8]' : 'border-l-[var(--color-gold)] bg-white'
                 } animate-slide-up`}
                 style={{ animationDelay: `${i * 0.05}s` }}
               >
                 {/* Header */}
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold text-[var(--text-primary)]">
+                    <span className="text-lg font-bold text-[var(--color-text-primary)]">
                       #{pedido.id_pedido}
                     </span>
-                    <span className={`badge ${isPendiente ? (isUrgente ? 'badge-danger' : 'badge-warning') : 'badge-info'}`}>
+                    <span className={`badge ${isPendiente ? 'state-pendiente' : 'state-preparacion'}`}>
                       {pedido.estado_pedido}
                     </span>
                   </div>
-                  <span className={`text-sm font-mono font-bold ${isUrgente ? 'text-[var(--danger)] animate-pulse' : 'text-[var(--text-muted)]'}`}>
-                    ⏱️ {formatTime(tiempoEspera)}
+                  <span className={`text-sm font-mono font-bold flex items-center gap-1 ${
+                    isUrgente ? 'text-[var(--color-cta)] animate-pulse-urgente' : 'text-[var(--color-text-muted)]'
+                  }`}>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    {formatTime(tiempoEspera)}
                   </span>
                 </div>
 
                 {/* Service info */}
-                <div className="flex items-center gap-3 text-xs text-[var(--text-muted)] mb-3">
-                  <span>{pedido.tipo_servicio === 'Comer en el Lugar' ? `🪑 Mesa ${pedido.numero_mesa}` : '📦 Para Llevar'}</span>
-                  {pedido.atendido_por && <span>👤 {pedido.atendido_por}</span>}
+                <div className="flex items-center gap-3 text-xs text-[var(--color-text-muted)] mb-4">
+                  <span className="flex items-center gap-1">
+                    {pedido.tipo_servicio === 'Comer en el Lugar' ? (
+                      <>
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16" />
+                        </svg>
+                        <span>Mesa {pedido.numero_mesa}</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                        <span>Para Llevar</span>
+                      </>
+                    )}
+                  </span>
+                  {pedido.atendido_por && (
+                    <span className="flex items-center gap-1">
+                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      <span>{pedido.atendido_por}</span>
+                    </span>
+                  )}
                 </div>
 
                 {/* Items */}
-                <div className="space-y-2 mb-4">
+                <div className="space-y-2 mb-5">
                   {pedido.items?.map((item, j) => (
-                    <div key={j} className="flex items-start gap-2 bg-[var(--bg-secondary)] rounded-lg p-2">
-                      <span className="text-sm font-bold text-[var(--accent-secondary)] w-6">{item.cantidad}x</span>
+                    <div key={j} className="flex items-start gap-2 bg-[var(--color-bg-card)] rounded-lg p-2.5 border border-[var(--color-border-warm)]/40">
+                      <span className="text-sm font-bold text-[var(--color-text-secondary)] w-6">{item.cantidad}x</span>
                       <div className="flex-1">
-                        <p className="text-sm text-[var(--text-primary)]">{item.nombre_producto}</p>
+                        <p className="text-sm text-[var(--color-text-primary)] font-medium">{item.nombre_producto}</p>
                         {item.observaciones && (
-                          <p className="text-xs text-[var(--warning)] mt-0.5 italic">⚠️ {item.observaciones}</p>
+                          <p className="text-xs text-[var(--color-warning)] mt-1 italic font-medium flex items-center gap-1">
+                            <svg className="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <span>{item.observaciones}</span>
+                          </p>
                         )}
                         {filtroCategoria === 'Todo' && (
-                          <span className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wider block mt-0.5">
+                          <span className="text-[10px] uppercase font-bold text-[var(--color-text-muted)] tracking-wider block mt-1">
                             {item.categoria}
                           </span>
                         )}
@@ -221,22 +258,22 @@ export default function CocinaPage() {
                   {isPendiente && (
                     <button
                       onClick={() => cambiarEstado(pedido.id_pedido, 'En Preparación')}
-                      className="btn-primary flex-1 text-sm py-2"
+                      className="flex-1 text-sm py-2 rounded-[6px] font-bold bg-[var(--color-gold)] text-[var(--color-bg-dark)] hover:opacity-90 transition-all cursor-pointer flex items-center justify-center gap-1.5 border-none"
                     >
-                      👨‍🍳 Preparar
+                      Preparar
                     </button>
                   )}
                   {pedido.estado_pedido === 'En Preparación' && (
                     <button
                       onClick={() => cambiarEstado(pedido.id_pedido, 'Listo')}
-                      className="flex-1 text-sm py-2 rounded-xl font-semibold bg-gradient-to-r from-emerald-500 to-emerald-600 text-white hover:shadow-lg transition-all"
+                      className="flex-1 text-sm py-2 rounded-[6px] font-bold bg-[var(--color-success)] text-white hover:opacity-90 transition-all cursor-pointer flex items-center justify-center gap-1.5 border-none"
                     >
-                      ✅ Listo
+                      Listo
                     </button>
                   )}
                   <button
                     onClick={() => cambiarEstado(pedido.id_pedido, 'Cancelado')}
-                    className="btn-secondary text-xs px-3 text-[var(--danger)]"
+                    className="text-xs px-3 rounded-[6px] font-bold bg-transparent border border-[var(--color-cta)] text-[var(--color-cta)] hover:bg-[var(--color-cta)]/5 transition-all cursor-pointer flex items-center justify-center"
                   >
                     ✕
                   </button>

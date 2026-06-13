@@ -1,199 +1,272 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
-  --bg-primary: #FBF3E8;        /* Blanco Crema / Leche de Avena */
-  --bg-secondary: #F3EAD8;      /* Crema un poco más oscuro */
-  --bg-card: #FFFFFF;           /* Tarjetas Blancas para contraste premium */
-  --bg-card-hover: #F8F0E2;     /* Tarjeta en hover */
-  --accent-primary: #8A6F57;    /* Beige Taupe */
-  --accent-secondary: #3B2B24;  /* Marrón café oscuro */
-  --accent-gold: #C2A388;       /* Beige dorado suave */
-  --text-primary: #3B2B24;      /* Marrón café oscuro para máxima legibilidad */
-  --text-secondary: #6B564C;    /* Café medio */
-  --text-muted: #8E7A6E;        /* Café claro apagado */
-  --success: #607C5B;           /* Verde oliva suave (plantas) */
-  --warning: #C08A5D;           /* Caramelo / warning */
-  --danger: #A64B4B;            /* Rojo suave / peligro */
-  --info: #6D8294;              /* Azul pastel / info */
-  --border-color: #E6DBC8;      /* Borde suave crema-marrón */
-  --glass-bg: rgba(255, 255, 255, 0.65);
-  --glass-border: rgba(138, 111, 87, 0.12);
+  /* ═══════════════════════════════════
+     PALETA PRINCIPAL — Regla 60-30-10
+     ═══════════════════════════════════ */
+
+  /* 60% — Fondos y superficies */
+  --color-bg-dark: #1A0A05;          /* Casi negro cálido — hero, footer, sidebar */
+  --color-bg-card: #FAF6EE;          /* Crema muy cálida — secciones de productos */
+  --color-bg-white: #FFFFFF;         /* Blanco puro — navbar, formularios, cards */
+  --color-bg-overlay: rgba(26, 10, 5, 0.62); /* Overlay sobre foto en hero */
+
+  /* 30% — Textos y estructura */
+  --color-text-on-dark: #FFFFFF;          /* Texto sobre fondos oscuros */
+  --color-text-primary: #2C0E06;          /* Marrón casi negro — texto sobre crema */
+  --color-text-secondary: #6B3020;        /* Marrón café medio — subtítulos */
+  --color-text-muted: #9C7060;            /* Marrón suave — texto de apoyo */
+  --color-border-warm: #D4C4B0;           /* Separadores sobre fondo crema */
+  --color-border-dark: rgba(255,255,255,0.15); /* Separadores sobre fondos oscuros */
+
+  /* 10% — Acento y CTAs */
+  --color-cta: #8B1A1A;               /* Borgoña oscuro — igual que la referencia */
+  --color-cta-hover: #6E1414;         /* Borgoña más oscuro en hover */
+  --color-cta-text: #FFFFFF;          /* Texto sobre botones */
+  --color-gold: #B8860B;              /* Oro viejo — precios y detalles premium */
+  --color-gold-light: #F5E6C0;        /* Oro muy claro — fondos de badges */
+
+  /* ESTADOS SEMÁNTICOS */
+  --color-success: #3D6B47;
+  --color-warning: #9A6F0A;
+  --color-danger: #8B1A1A;           /* Mismo que CTA — coherencia */
+  --color-inactive: #BDB0A8;
+
+  /* SOMBRAS */
+  --shadow-card: 0 2px 8px rgba(26, 10, 5, 0.10);
+  --shadow-card-hover: 0 6px 20px rgba(26, 10, 5, 0.18);
+  --shadow-modal: 0 24px 64px rgba(26, 10, 5, 0.25);
+  --shadow-button: 0 2px 8px rgba(139, 26, 26, 0.35);
+
+  /* TIPOGRAFÍA */
+  --font-display: 'Playfair Display', Georgia, serif;  /* Títulos grandes, nombre de marca */
+  --font-body: 'Inter', system-ui, sans-serif;          /* Todo lo demás */
 }
 
 @theme inline {
-  --color-background: var(--bg-primary);
-  --color-foreground: var(--text-primary);
-  --font-sans: 'Inter', system-ui, sans-serif;
-  --font-serif: 'Playfair Display', serif;
-  --color-accent: var(--accent-primary);
-  --color-accent-secondary: var(--accent-secondary);
-  --color-gold: var(--accent-gold);
-  --color-card: var(--bg-card);
-  --color-card-hover: var(--bg-card-hover);
-  --color-muted: var(--text-muted);
-  --color-secondary-text: var(--text-secondary);
-  --color-success: var(--success);
-  --color-warning: var(--warning);
-  --color-danger: var(--danger);
-  --color-info: var(--info);
-  --color-border: var(--border-color);
-  --color-glass: var(--glass-bg);
-  --color-glass-border: var(--glass-border);
-  --color-bg-secondary: var(--bg-secondary);
+  --color-background: var(--color-bg-card);
+  --color-foreground: var(--color-text-primary);
+  --font-sans: var(--font-body);
+  --font-serif: var(--font-display);
+  --color-accent: var(--color-cta);
+  --color-accent-secondary: var(--color-text-secondary);
+  --color-gold: var(--color-gold);
+  --color-card: var(--color-bg-white);
+  --color-card-hover: var(--color-bg-card);
+  --color-muted: var(--color-text-muted);
+  --color-secondary-text: var(--color-text-secondary);
+  --color-success: var(--color-success);
+  --color-warning: var(--color-warning);
+  --color-danger: var(--color-danger);
+  --color-info: #6D8294;
+  --color-border: var(--color-border-warm);
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--accent-primary) var(--bg-secondary);
+  scrollbar-color: var(--color-cta) var(--color-bg-card);
 }
 
 body {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
+  font-family: var(--font-body);
   min-height: 100vh;
 }
 
-/* Glass Morphism Card */
+/* Updated layout card - Section 6.1 (Sin glassmorphism) */
 .glass-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--glass-border);
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(59, 43, 36, 0.03);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--color-bg-white);
+  border: 1px solid var(--color-border-warm);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  transition: all 0.2s ease;
 }
 
 .glass-card:hover {
-  border-color: var(--accent-primary);
-  background: var(--bg-card);
-  box-shadow: 0 10px 30px rgba(138, 111, 87, 0.08);
+  border-color: var(--color-border-warm);
+  background: var(--color-bg-white);
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
 }
 
-/* Gradient Button */
+/* Premium Buttons - Section 6.3 & Redesign scale */
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent-primary), var(--accent-gold));
-  color: #FFFFFF;
-  font-weight: 600;
-  padding: 0.625rem 1.5rem;
-  border-radius: 12px;
-  transition: all 0.3s ease;
+  background: var(--color-cta);
+  color: var(--color-cta-text);
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 13px;
+  padding: 10px 22px;
+  border-radius: 6px;
+  transition: background-color 0.15s ease;
   border: none;
   cursor: pointer;
-  font-size: 0.875rem;
-  box-shadow: 0 4px 12px rgba(138, 111, 87, 0.15);
+  box-shadow: var(--shadow-button);
 }
 
 .btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgba(138, 111, 87, 0.3);
+  background: var(--color-cta-hover);
 }
 
 .btn-primary:active {
-  transform: translateY(0);
+  transform: scale(0.98);
 }
 
 .btn-secondary {
-  background: var(--bg-card);
-  color: var(--text-primary);
-  font-weight: 500;
-  padding: 0.625rem 1.5rem;
-  border-radius: 12px;
-  border: 1px solid var(--border-color);
-  transition: all 0.3s ease;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-weight: 600;
+  font-size: 13px;
+  padding: 10px 22px;
+  border-radius: 6px;
+  border: 1.5px solid var(--color-border-warm);
+  transition: all 0.15s ease;
   cursor: pointer;
-  font-size: 0.875rem;
-  box-shadow: 0 2px 6px rgba(59, 43, 36, 0.02);
 }
 
 .btn-secondary:hover {
-  background: var(--bg-card-hover);
-  border-color: var(--accent-primary);
-  color: var(--text-primary);
+  background: var(--color-bg-card);
+  border-color: var(--color-text-secondary);
+  color: var(--color-text-primary);
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
 }
 
 .btn-danger {
-  background: linear-gradient(135deg, #a64b4b, #bd5c5c);
+  background: var(--color-danger);
   color: white;
   font-weight: 600;
-  padding: 0.625rem 1.5rem;
-  border-radius: 12px;
+  font-size: 13px;
+  padding: 10px 22px;
+  border-radius: 6px;
   border: none;
   cursor: pointer;
-  font-size: 0.875rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(166, 75, 75, 0.15);
+  transition: all 0.15s ease;
 }
 
 .btn-danger:hover {
-  box-shadow: 0 8px 20px rgba(166, 75, 75, 0.3);
+  background: var(--color-cta-hover);
 }
 
-/* Input styling */
+/* Inputs - Section 6.3 & No glow rule */
 .input-field {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
+  background: var(--color-bg-white);
+  border: 1.5px solid var(--color-border-warm);
+  border-radius: 6px;
   padding: 0.75rem 1rem;
-  color: var(--text-primary);
+  color: var(--color-text-primary);
   font-size: 0.875rem;
   width: 100%;
-  transition: all 0.3s ease;
+  transition: border-color 0.15s ease;
   outline: none;
-  box-shadow: inset 0 2px 4px rgba(59, 43, 36, 0.02);
 }
 
 .input-field:focus {
-  border-color: var(--accent-primary);
-  background: #FFFFFF;
-  box-shadow: 0 0 0 3px rgba(138, 111, 87, 0.15);
+  border-color: var(--color-cta);
+  background: var(--color-bg-white);
+  box-shadow: none; /* No shadow/glow on focus */
 }
 
 .input-field::placeholder {
-  color: var(--text-muted);
+  color: var(--color-text-muted);
 }
 
-
-/* Badge */
+/* Badges - Section 5.4 & Section 6.3 */
 .badge {
   display: inline-flex;
   align-items: center;
   padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
+  border-radius: 100px; /* pill badge */
   font-size: 0.75rem;
   font-weight: 600;
   letter-spacing: 0.025em;
 }
 
+.badge-rectangular {
+  border-radius: 4px !important;
+}
+
+/* Role Badges mapping */
+.role-superadmin {
+  background: var(--color-cta);
+  color: var(--color-cta-text);
+}
+
+.role-administrador {
+  background: #F5E6C0;
+  color: #6B3020;
+}
+
+.role-cajero, .role-mesero {
+  background: #E8F0EA;
+  color: #3D6B47;
+}
+
+.role-barista, .role-cocina {
+  background: #FBF3E3;
+  color: #9A6F0A;
+}
+
+/* Order States Badges */
+.state-pendiente {
+  background: #FBF3E3;
+  color: #9A6F0A;
+}
+
+.state-preparacion {
+  background: #E8F0EA;
+  color: #3D6B47;
+}
+
+.state-listo {
+  background: #F5E6C0;
+  color: #6B3020;
+}
+
+.state-entregado {
+  background: var(--color-bg-card);
+  color: var(--color-text-muted);
+}
+
+.state-cancelado {
+  background: #FCEAEA;
+  color: var(--color-cta);
+}
+
+/* Generic Fallbacks */
 .badge-success {
-  background: rgba(74, 222, 128, 0.15);
-  color: var(--success);
+  background: #E8F0EA;
+  color: #3D6B47;
 }
 
 .badge-warning {
-  background: rgba(251, 191, 36, 0.15);
-  color: var(--warning);
+  background: #FBF3E3;
+  color: #9A6F0A;
 }
 
 .badge-danger {
-  background: rgba(248, 113, 113, 0.15);
-  color: var(--danger);
+  background: #FCEAEA;
+  color: var(--color-cta);
 }
 
 .badge-info {
-  background: rgba(96, 165, 250, 0.15);
-  color: var(--info);
+  background: #FAF6EE;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border-warm);
 }
 
-/* Pulse animation for critical alerts */
-@keyframes pulse-danger {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+/* Urgent Timer pulse - Section 6.5 */
+@keyframes pulse-urgente {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.98); }
 }
 
-.animate-pulse-danger {
-  animation: pulse-danger 1.5s ease-in-out infinite;
+.animate-pulse-urgente {
+  animation: pulse-urgente 1.2s ease-in-out infinite;
 }
 
 /* Fade in animation */
@@ -220,8 +293,8 @@ body {
 .spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid var(--border-color);
-  border-top-color: var(--accent-primary);
+  border: 3px solid var(--color-border-warm);
+  border-top-color: var(--color-cta);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -230,77 +303,86 @@ body {
   to { transform: rotate(360deg); }
 }
 
-/* Mesa card states */
+/* Mesa card states - Section 5.5 */
 .mesa-disponible {
-  border-color: var(--success);
-  background: rgba(74, 222, 128, 0.05);
+  border-color: var(--color-success);
+  background: rgba(61, 107, 71, 0.04);
 }
 
 .mesa-disponible:hover {
-  background: rgba(74, 222, 128, 0.12);
-  box-shadow: 0 0 20px rgba(74, 222, 128, 0.15);
+  background: rgba(61, 107, 71, 0.08);
+  box-shadow: 0 4px 12px rgba(61, 107, 71, 0.12);
 }
 
 .mesa-ocupada {
-  border-color: var(--danger);
-  background: rgba(248, 113, 113, 0.05);
+  border-color: var(--color-cta);
+  background: rgba(139, 26, 26, 0.04);
+}
+
+.mesa-ocupada:hover {
+  background: rgba(139, 26, 26, 0.08);
+  box-shadow: 0 4px 12px rgba(139, 26, 26, 0.12);
 }
 
 .mesa-reservada {
-  border-color: var(--warning);
-  background: rgba(251, 191, 36, 0.05);
+  border-color: var(--color-gold);
+  background: rgba(184, 134, 11, 0.04);
+}
+
+.mesa-reservada:hover {
+  background: rgba(184, 134, 11, 0.08);
+  box-shadow: 0 4px 12px rgba(184, 134, 11, 0.12);
 }
 
 .mesa-inactiva {
-  border-color: var(--text-muted);
-  background: rgba(107, 101, 128, 0.05);
+  border-color: var(--color-inactive);
+  background: rgba(189, 176, 168, 0.04);
   opacity: 0.5;
+  cursor: not-allowed;
 }
 
-/* Sidebar */
+/* Sidebar links - Section 5.1 */
 .sidebar-link {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;
-  border-radius: 12px;
-  color: var(--text-secondary);
+  padding: 10px 16px;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.65);
   font-weight: 500;
-  font-size: 0.875rem;
+  font-size: 14px;
   transition: all 0.2s ease;
   text-decoration: none;
 }
 
 .sidebar-link:hover {
-  background: var(--bg-card);
-  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.07);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .sidebar-link.active {
-  background: linear-gradient(135deg, rgba(200, 149, 108, 0.15), rgba(200, 149, 108, 0.05));
-  color: var(--accent-secondary);
-  border: 1px solid rgba(200, 149, 108, 0.2);
+  background: var(--color-cta);
+  color: #FFFFFF;
 }
 
-/* Metric card */
+/* Metric card - Section 5.3 */
 .metric-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--glass-border);
-  border-radius: 16px;
+  background: var(--color-bg-white);
+  border: 1px solid var(--color-border-warm);
+  border-radius: 12px;
   padding: 1.5rem;
   transition: all 0.3s ease;
 }
 
 .metric-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-card-hover);
 }
 
 /* Select */
 select.input-field {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23a39eb8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239C7060' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
   background-position: right 0.75rem center;
   background-repeat: no-repeat;
   background-size: 1.25rem;
@@ -314,7 +396,7 @@ select.input-field {
   right: 1.5rem;
   z-index: 9999;
   padding: 1rem 1.5rem;
-  border-radius: 12px;
+  border-radius: 6px;
   font-weight: 500;
   animation: slideInRight 0.4s ease-out, fadeOut 0.4s ease-in 3.6s forwards;
   max-width: 400px;
@@ -330,101 +412,30 @@ select.input-field {
   to { opacity: 0; }
 }
 
-/* QR Code container */
-.qr-container {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 16px;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-/* Number pad for POS */
-.numpad-btn {
-  aspect-ratio: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  font-weight: 600;
-  border-radius: 12px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.numpad-btn:hover {
-  background: var(--bg-card-hover);
-  border-color: var(--accent-primary);
-}
-
-.numpad-btn:active {
-  transform: scale(0.95);
-}
-
-/* ============================================================================
-   BENTO GRID & NEOMORFISMO SUAVE (SOFT SKEUOMORPHISM)
-   ============================================================================ */
-
-/* Sombras Neomórficas para elementos que flotan o sobresalen */
-.shadow-neomorph-out {
-  box-shadow: 
-    6px 6px 12px rgba(59, 43, 36, 0.05), 
-    -6px -6px 12px rgba(255, 255, 255, 0.95);
-}
-
-/* Sombras Neomórficas para campos de texto e inputs (hundidos) */
-.shadow-neomorph-in {
-  box-shadow: 
-    inset 3px 3px 6px rgba(59, 43, 36, 0.04), 
-    inset -3px -3px 6px rgba(255, 255, 255, 0.9);
-}
-
-/* Efecto hover neomórfico interactivo */
-.shadow-neomorph-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.shadow-neomorph-hover:hover {
-  box-shadow: 
-    10px 10px 20px rgba(59, 43, 36, 0.08), 
-    -10px -10px 20px rgba(255, 255, 255, 1);
-  transform: translateY(-2px);
-}
-
-/* Tarjetas Bento Grid */
+/* Bento Cards style */
 .bento-card {
-  background: #FFFFFF;
-  border-radius: 24px;
-  border: 1px solid rgba(138, 111, 87, 0.07);
-  box-shadow: 
-    6px 6px 12px rgba(59, 43, 36, 0.04), 
-    -6px -6px 12px rgba(255, 255, 255, 0.95);
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--color-bg-white);
+  border-radius: 12px; /* Cards grandes: 12px */
+  border: 1px solid var(--color-border-warm);
+  box-shadow: var(--shadow-card);
+  transition: all 0.2s ease;
   padding: 1.5rem;
   position: relative;
   overflow: hidden;
 }
 
 .bento-card:hover {
-  border-color: var(--accent-primary);
-  box-shadow: 
-    10px 10px 22px rgba(59, 43, 36, 0.08), 
-    -10px -10px 22px rgba(255, 255, 255, 1);
-  transform: translateY(-3px);
+  border-color: var(--color-border-warm);
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
 }
 
-/* Animación de Balanceo y Efectos */
+/* Sway animation */
 @keyframes sway-slow {
   0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-12px) rotate(6deg); }
+  50% { transform: translateY(-8px) rotate(4deg); }
 }
 
 .animate-sway-slow {
   animation: sway-slow 7s infinite ease-in-out;
 }
-

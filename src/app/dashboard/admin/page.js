@@ -64,7 +64,11 @@ export default function AdminPage() {
           title="Ingresos del Día"
           value={`Bs. ${parseFloat(hoy.ingresos_pagados || 0).toFixed(2)}`}
           subtitle="Pagados confirmados"
-          icon="💰"
+          icon={
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          }
           color="from-emerald-500/20 to-emerald-600/5"
           borderColor="border-emerald-500/30"
         />
@@ -72,7 +76,11 @@ export default function AdminPage() {
           title="Pedidos Hoy"
           value={hoy.total_pedidos || 0}
           subtitle="Comandas registradas"
-          icon="📋"
+          icon={
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            </svg>
+          }
           color="from-blue-500/20 to-blue-600/5"
           borderColor="border-blue-500/30"
         />
@@ -80,7 +88,11 @@ export default function AdminPage() {
           title="Efectivo en Caja"
           value={`Bs. ${parseFloat(hoy.efectivo || 0).toFixed(2)}`}
           subtitle="Pagos en efectivo"
-          icon="💵"
+          icon={
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          }
           color="from-amber-500/20 to-amber-600/5"
           borderColor="border-amber-500/30"
         />
@@ -88,7 +100,11 @@ export default function AdminPage() {
           title="Pagos QR"
           value={`Bs. ${parseFloat(hoy.qr || 0).toFixed(2)}`}
           subtitle="Transferencias QR"
-          icon="📱"
+          icon={
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+          }
           color="from-purple-500/20 to-purple-600/5"
           borderColor="border-purple-500/30"
         />
@@ -99,7 +115,7 @@ export default function AdminPage() {
         {/* Weekly revenue */}
         <div className="glass-card p-6">
           <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-            📈 Ingresos Últimos 7 Días
+            Ingresos Últimos 7 Días
           </h3>
           <div className="space-y-3">
             {(metricas?.semanal || []).map((dia, i) => {
@@ -133,7 +149,7 @@ export default function AdminPage() {
         {/* Top products */}
         <div className="glass-card p-6">
           <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-            🏆 Top 5 Productos del Mes
+            Top 5 Productos del Mes
           </h3>
           <div className="space-y-3">
             {(metricas?.top_productos || []).map((prod, i) => (
@@ -161,7 +177,7 @@ export default function AdminPage() {
       {/* Orders by status */}
       <div className="glass-card p-6">
         <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-          📊 Pedidos por Estado (Hoy)
+          Pedidos por Estado (Hoy)
         </h3>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {['Pendiente', 'En Preparación', 'Listo', 'Entregado', 'Cancelado'].map((estado) => {
@@ -187,15 +203,25 @@ export default function AdminPage() {
   );
 }
 
-function MetricCard({ title, value, subtitle, icon, color, borderColor }) {
+function MetricCard({ title, value, subtitle, icon }) {
   return (
-    <div className={`metric-card bg-gradient-to-br ${color} border ${borderColor}`}>
-      <div className="flex items-start justify-between mb-3">
-        <span className="text-2xl">{icon}</span>
+    <div className="bg-[var(--color-bg-white)] border border-[var(--color-border-warm)] rounded-xl p-6 transition-all hover:shadow-card-hover select-none">
+      <div className="flex items-start justify-between mb-4">
+        <div className="w-11 h-11 bg-[rgba(139,26,26,0.08)] text-[var(--color-cta)] rounded-lg flex items-center justify-center">
+          {icon}
+        </div>
       </div>
-      <p className="text-2xl font-bold text-[var(--text-primary)]">{value}</p>
-      <p className="text-sm font-medium text-[var(--text-primary)] mt-1">{title}</p>
-      <p className="text-xs text-[var(--text-muted)] mt-0.5">{subtitle}</p>
+      <p className="text-3xl sm:text-4xl font-bold text-[var(--color-text-primary)] leading-none" style={{ fontFamily: 'var(--font-serif)' }}>
+        {value}
+      </p>
+      <p className="text-sm font-medium text-[var(--color-text-primary)] mt-4">
+        {title}
+      </p>
+      {subtitle && (
+        <p className="text-xs text-[var(--color-text-muted)] mt-1">
+          {subtitle}
+        </p>
+      )}
     </div>
   );
 }

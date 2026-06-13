@@ -64,19 +64,28 @@ export default function AlmacenPage() {
     <div className="space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-playfair)' }}>
-            📦 Control de Inventario
+          <h1 className="text-2xl font-bold text-[var(--text-primary)] flex items-center gap-2" style={{ fontFamily: 'var(--font-playfair)' }}>
+            <svg className="w-7 h-7 text-[var(--accent-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+            <span>Control de Inventario</span>
           </h1>
           <p className="text-sm text-[var(--text-secondary)] mt-1">Gestión de materia prima y alertas de stock</p>
         </div>
         <button onClick={loadInsumos} className="btn-secondary flex items-center gap-2">
-          🔄 Actualizar
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Actualizar
         </button>
       </div>
 
       {success && (
-        <div className="toast bg-[rgba(74,222,128,0.15)] border border-[var(--success)] text-[var(--success)]">
-          ✅ {success}
+        <div className="toast bg-[rgba(74,222,128,0.15)] border border-[var(--success)] text-[var(--success)] flex items-center gap-2">
+          <svg className="w-4 h-4 text-[var(--success)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+          <span>{success}</span>
         </div>
       )}
       {error && (
@@ -98,7 +107,7 @@ export default function AlmacenPage() {
         </div>
         <div className={`glass-card p-5 border-l-4 border-[var(--danger)] ${resumen.criticos > 0 ? 'animate-pulse-danger' : ''}`}>
           <p className="text-3xl font-bold text-[var(--danger)]">{resumen.criticos || 0}</p>
-          <p className="text-sm text-[var(--text-muted)]">Stock Crítico ⚠️</p>
+          <p className="text-sm text-[var(--text-muted)]">Stock Crítico</p>
         </div>
       </div>
 
@@ -116,13 +125,16 @@ export default function AlmacenPage() {
         </button>
         <button
           onClick={() => setFiltro('criticos')}
-          className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+          className={`px-4 py-2 rounded-xl text-sm font-medium transition-all flex items-center gap-1.5 ${
             filtro === 'criticos'
               ? 'bg-gradient-to-r from-red-500 to-red-600 text-white'
               : 'bg-[var(--bg-card)] text-[var(--text-secondary)]'
           }`}
         >
-          🚨 Críticos ({insumos.filter(i => parseFloat(i.stock_actual) <= parseFloat(i.stock_minimo)).length})
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <span>Críticos ({insumos.filter(i => parseFloat(i.stock_actual) <= parseFloat(i.stock_minimo)).length})</span>
         </button>
       </div>
 
@@ -146,7 +158,7 @@ export default function AlmacenPage() {
                 {isAgotado ? (
                   <span className="badge badge-danger">AGOTADO</span>
                 ) : isCritico ? (
-                  <span className="badge badge-danger">⚠️ CRÍTICO</span>
+                  <span className="badge badge-danger">CRÍTICO</span>
                 ) : insumo.nivel_stock === 'BAJO' ? (
                   <span className="badge badge-warning">BAJO</span>
                 ) : (
@@ -188,7 +200,7 @@ export default function AlmacenPage() {
                     autoFocus
                   />
                   <button onClick={() => reabastecer(insumo.id_insumo)} className="btn-primary text-sm px-4">
-                    ✅ Agregar
+                    Agregar
                   </button>
                   <button onClick={() => { setShowReabastecer(null); setCantidadAgregar(''); }} className="btn-secondary text-sm px-3">
                     ✕

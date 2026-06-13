@@ -107,14 +107,7 @@ export default function MenuPublicoPage() {
     }
   }
 
-  const catEmojis = {
-    'Bebidas Calientes': '☕',
-    'Bebidas Frías': '🧊',
-    'Repostería': '🧁',
-    'Desayunos': '🍳',
-    'Meriendas': '🫖',
-    'Todas': '🌱'
-  };
+  // No emojis needed for categories
 
   const catColors = {
     'Bebidas Calientes': 'bg-emerald-50 text-emerald-800 border-emerald-100',
@@ -203,8 +196,6 @@ export default function MenuPublicoPage() {
     <div className="min-h-screen relative bg-[#FBF3E8] text-[#3B2B24] flex flex-col">
       {/* Sunlight decoration */}
       <div className="absolute top-0 right-0 w-2/3 h-80 bg-gradient-to-b from-white/60 to-transparent pointer-events-none z-0 filter blur-3xl" />
-      <div className="absolute top-12 left-4 text-4xl opacity-10 select-none animate-sway-slow pointer-events-none">🌿</div>
-      <div className="absolute top-96 right-4 text-4xl opacity-15 select-none animate-sway-slow pointer-events-none">🌱</div>
 
       {/* Header */}
       <header className="sticky top-0 z-30 bg-white/85 backdrop-blur-md border-b border-[#E6DBC8] px-6 py-4 z-10 shadow-sm">
@@ -223,7 +214,10 @@ export default function MenuPublicoPage() {
             onClick={() => setShowCarrito(true)}
             className="btn-primary relative flex items-center gap-2 text-xs py-2 px-4 shadow-neomorph-hover"
           >
-            🛒 Carrito
+            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <span>Carrito</span>
             {totalItems > 0 && (
               <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-[#A64B4B] text-white text-[10px] flex items-center justify-center font-bold animate-bounce">
                 {totalItems}
@@ -261,7 +255,7 @@ export default function MenuPublicoPage() {
                     : 'bg-[#FBF3E8] text-[#6B564C] hover:bg-[#F8F0E2] border border-[#E6DBC8]/50'
                 }`}
               >
-                {catEmojis[cat] || '🍴'} {cat}
+                {cat}
               </button>
             ))}
           </div>
@@ -275,7 +269,11 @@ export default function MenuPublicoPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <span className="absolute left-3 top-2.5 text-xs text-[#8E7A6E]">🔍</span>
+            <span className="absolute left-3 top-2.5 text-xs text-[#8E7A6E] flex items-center">
+              <svg className="w-3.5 h-3.5 text-[#8E7A6E]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </span>
           </div>
 
         </div>
@@ -284,8 +282,10 @@ export default function MenuPublicoPage() {
       {/* Products Grid (Bento cards look for all items) */}
       <div className="max-w-7xl mx-auto px-6 py-8 flex-1 w-full z-10">
         {productosFiltrados.length === 0 ? (
-          <div className="glass-card p-12 text-center max-w-md mx-auto shadow-neomorph-out">
-            <span className="text-4xl block mb-2">🍃</span>
+          <div className="glass-card p-12 text-center max-w-md mx-auto shadow-neomorph-out flex flex-col items-center">
+            <svg className="w-12 h-12 text-[#8E7A6E] mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
             <p className="text-sm font-semibold text-[#8E7A6E]">No hay productos en esta selección.</p>
           </div>
         ) : (
@@ -299,7 +299,12 @@ export default function MenuPublicoPage() {
                 >
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <span className="text-3xl p-1.5 bg-[#FBF3E8] rounded-xl">{catEmojis[prod.categoria] || '🍴'}</span>
+                      <span className="p-1.5 bg-[#FBF3E8] rounded-xl flex items-center justify-center">
+                        <svg className="w-6 h-6 text-[#8A6F57]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 5c0-1.1.9-2 2-2h8a2 2 0 012 2v6a5 5 0 01-5 5H9a5 5 0 01-5-5V5z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 7h1a2 2 0 012 2v2a2 2 0 01-2 2h-1M6 19h12" />
+                        </svg>
+                      </span>
                       <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${catColors[prod.categoria] || 'bg-stone-100 text-stone-800'}`}>
                         {prod.categoria}
                       </span>
@@ -348,7 +353,12 @@ export default function MenuPublicoPage() {
           <div className="absolute inset-0 bg-black/40 backdrop-blur-xs" onClick={() => setShowCarrito(false)} />
           <div className="absolute right-0 top-0 bottom-0 w-full sm:max-w-md bg-white border-l border-[#E6DBC8] flex flex-col animate-slide-up shadow-2xl z-10">
             <div className="p-5 border-b border-[#E6DBC8] flex items-center justify-between bg-[#FBF3E8]">
-              <h3 className="text-base font-bold text-[#3B2B24]">🛒 Mi Pedido Digital</h3>
+              <h3 className="text-base font-bold text-[#3B2B24] flex items-center gap-2">
+                <svg className="w-5 h-5 text-[#3B2B24]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <span>Mi Pedido Digital</span>
+              </h3>
               <button onClick={() => setShowCarrito(false)} className="p-1.5 rounded-full hover:bg-neutral-200 text-[#3B2B24] text-sm font-bold">
                 ✕
               </button>
@@ -356,35 +366,43 @@ export default function MenuPublicoPage() {
 
             <div className="flex-1 overflow-y-auto p-5 space-y-4">
               {carrito.length === 0 ? (
-                <div className="text-center py-16">
-                  <span className="text-5xl block mb-3 animate-pulse">🛒</span>
+                <div className="text-center py-16 flex flex-col items-center">
+                  <svg className="w-12 h-12 text-[#8E7A6E] mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                  </svg>
                   <p className="text-xs font-semibold text-[#8E7A6E]">El carrito está vacío</p>
                 </div>
               ) : (
                 <>
                   {/* Service selection */}
                   <div className="space-y-2">
-                    <p className="text-xs font-bold text-[#8A6F57] uppercase tracking-wider">📌 Canal de distribución</p>
+                    <p className="text-xs font-bold text-[#8A6F57] uppercase tracking-wider">Canal de distribución</p>
                     <div className="grid grid-cols-2 gap-2">
                       <button
                         onClick={() => setTipoServicio('Comer en el Lugar')}
-                        className={`p-3 rounded-xl border text-left text-xs font-bold transition-all ${
+                        className={`p-3 rounded-xl border text-left text-xs font-bold transition-all flex items-center gap-1.5 ${
                           tipoServicio === 'Comer en el Lugar'
                             ? 'bg-[#3B2B24] border-[#3B2B24] text-white shadow-sm'
                             : 'bg-white border-[#E6DBC8] text-[#3B2B24]'
                         }`}
                       >
-                        🪑 En el Lugar
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16" />
+                        </svg>
+                        <span>En el Lugar</span>
                       </button>
                       <button
                         onClick={() => { setTipoServicio('Para Llevar / Recoger'); setNumeroMesa(''); }}
-                        className={`p-3 rounded-xl border text-left text-xs font-bold transition-all ${
+                        className={`p-3 rounded-xl border text-left text-xs font-bold transition-all flex items-center gap-1.5 ${
                           tipoServicio === 'Para Llevar / Recoger'
                             ? 'bg-[#3B2B24] border-[#3B2B24] text-white shadow-sm'
                             : 'bg-white border-[#E6DBC8] text-[#3B2B24]'
                         }`}
                       >
-                        📦 Para Llevar
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
+                        <span>Para Llevar</span>
                       </button>
                     </div>
                   </div>
@@ -392,7 +410,7 @@ export default function MenuPublicoPage() {
                   {tipoServicio === 'Comer en el Lugar' && (
                     <div className="bg-[#FBF3E8] rounded-xl p-4 border border-[#E6DBC8] animate-fade-in shadow-neomorph-in">
                       <label className="block text-xs font-bold text-[#8A6F57] uppercase tracking-wider mb-2">
-                        🪑 Selecciona Mesa
+                        Selecciona Mesa
                       </label>
                       <select
                         className="input-field text-xs font-bold text-center border-[#E6DBC8] bg-white cursor-pointer"
@@ -409,7 +427,7 @@ export default function MenuPublicoPage() {
 
                   {/* Payment Method */}
                   <div className="space-y-2">
-                    <p className="text-xs font-bold text-[#8A6F57] uppercase tracking-wider">💳 Método de Pago</p>
+                    <p className="text-xs font-bold text-[#8A6F57] uppercase tracking-wider">Método de Pago</p>
                     <div className="grid grid-cols-2 gap-2">
                       {['Efectivo', 'Pago QR Simple'].map(met => (
                         <button
@@ -421,7 +439,23 @@ export default function MenuPublicoPage() {
                               : 'bg-white border-[#E6DBC8] text-[#6B564C] hover:bg-[#F8F0E2]'
                           }`}
                         >
-                          {met === 'Pago QR Simple' ? '📱 QR Simple' : '💵 Efectivo'}
+                          <span className="flex items-center justify-center gap-1.5">
+                            {met === 'Pago QR Simple' ? (
+                              <>
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                </svg>
+                                <span>QR Simple</span>
+                              </>
+                            ) : (
+                              <>
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                <span>Efectivo</span>
+                              </>
+                            )}
+                          </span>
                         </button>
                       ))}
                     </div>
@@ -474,7 +508,12 @@ export default function MenuPublicoPage() {
             {carrito.length > 0 && (
               <div className="p-5 border-t border-[#E6DBC8] bg-[#FBF3E8]">
                 {error && (
-                  <p className="text-xs text-[#A64B4B] bg-[#A64B4B]/15 p-2.5 rounded-xl mb-3">⚠️ {error}</p>
+                  <p className="text-xs text-[#A64B4B] bg-[#A64B4B]/15 p-2.5 rounded-xl mb-3 flex items-center gap-1.5">
+                    <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    <span>{error}</span>
+                  </p>
                 )}
                 <div className="flex items-center justify-between mb-4">
                   <div>
@@ -487,7 +526,7 @@ export default function MenuPublicoPage() {
                   disabled={enviando || !tipoServicio || (tipoServicio === 'Comer en el Lugar' && !numeroMesa)}
                   className="btn-primary w-full py-3 text-xs uppercase tracking-widest font-bold disabled:opacity-50 shadow-neomorph-hover"
                 >
-                  {enviando ? 'Enviando orden...' : '📋 Confirmar Compra'}
+                  {enviando ? 'Enviando orden...' : 'Confirmar Compra'}
                 </button>
               </div>
             )}
