@@ -80,6 +80,17 @@ export default function HomePage() {
     });
   }
 
+  function handleOrderFeatured(nombreClave) {
+    const prod = productos.find(p => p.nombre_producto.toLowerCase().includes(nombreClave.toLowerCase()));
+    if (prod) {
+      addToCart(prod);
+      setShowCarrito(true);
+    } else {
+      const el = document.getElementById('catalogo');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
   function updateQty(id, delta) {
     setCarrito(prev => prev.map(i => i.id_producto === id ? { ...i, qty: Math.max(0, i.qty + delta) } : i).filter(i => i.qty > 0));
   }
@@ -401,7 +412,7 @@ export default function HomePage() {
                 const el = document.getElementById('destacados');
                 el?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="btn-secondary py-3.5 px-7 text-xs uppercase tracking-wider font-bold border-white/50 text-white hover:bg-white/10 hover:border-white cursor-pointer"
+              className="btn-secondary py-3.5 px-7 text-xs uppercase tracking-wider font-bold !border-white/50 !text-white hover:!bg-white hover:!text-black hover:!border-white cursor-pointer"
             >
               Conocer el Espacio
             </button>
@@ -500,7 +511,7 @@ export default function HomePage() {
             <div className="relative w-full md:w-80">
               <input
                 type="text"
-                className="input-field pl-10 pr-10 py-3 bg-[var(--color-bg-card)] border-[var(--color-border-warm)] rounded-lg focus:border-[var(--color-cta)] focus:bg-[var(--color-bg-white)]"
+                className="input-field !pl-10 !pr-10 !py-3 bg-[var(--color-bg-card)] border-[var(--color-border-warm)] rounded-lg focus:border-[var(--color-cta)] focus:bg-[var(--color-bg-white)]"
                 placeholder="Buscar tu café o postre favorito..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}

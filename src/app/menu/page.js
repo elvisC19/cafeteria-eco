@@ -264,7 +264,7 @@ export default function MenuPublicoPage() {
           <div className="relative w-full md:w-72">
             <input
               type="text"
-              className="input-field py-1.5 pl-9 pr-4 text-xs border-[#E6DBC8] shadow-neomorph-in"
+              className="input-field !py-1.5 !pl-9 !pr-4 text-xs border-[#E6DBC8] shadow-neomorph-in"
               placeholder="Buscar producto..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}

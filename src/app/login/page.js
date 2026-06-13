@@ -125,31 +125,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Sección credenciales demo */}
-          <div className="mt-8 bg-[var(--color-bg-card)] border border-[var(--color-border-warm)] rounded-[12px] p-5">
-            <p className="text-[11px] text-[var(--color-text-muted)] mb-3 text-center font-bold uppercase tracking-wider">
-              Credenciales de Demostración
-            </p>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              {[
-                { nombre: 'Administrador General', pass: 'admin123', rol: 'SuperAdmin' },
-                { nombre: 'Carlos Mendoza', pass: 'cajero123', rol: 'Cajero' },
-                { nombre: 'María Gutiérrez', pass: 'barista123', rol: 'Barista' },
-                { nombre: 'José Flores', pass: 'cocina123', rol: 'Cocina' },
-              ].map((cred, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => { setNombre(cred.nombre); setPassword(cred.pass); }}
-                  className="text-left p-2.5 rounded-lg bg-white border border-[var(--color-border-warm)] hover:border-[var(--color-cta)] transition-all duration-150 cursor-pointer flex flex-col justify-between h-14"
-                >
-                  <span className="block text-[var(--color-text-primary)] font-bold truncate w-full">{cred.nombre}</span>
-                  <span className="text-[10px] text-[var(--color-text-muted)] font-medium mt-0.5">{cred.rol}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
         </div>
 
         {/* Footer outside the card */}
