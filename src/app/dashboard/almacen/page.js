@@ -1,8 +1,11 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { insumosAPI } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
+import AsistenciaControl from '@/components/AsistenciaControl';
 
 export default function AlmacenPage() {
+  const { usuario } = useAuth();
   const [insumos, setInsumos] = useState([]);
   const [resumen, setResumen] = useState({});
   const [loading, setLoading] = useState(true);
@@ -62,7 +65,7 @@ export default function AlmacenPage() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-[var(--color-border-warm)] pb-5 gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[var(--text-primary)] flex items-center gap-2" style={{ fontFamily: 'var(--font-playfair)' }}>
             <svg className="w-7 h-7 text-[var(--accent-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -72,12 +75,15 @@ export default function AlmacenPage() {
           </h1>
           <p className="text-sm text-[var(--text-secondary)] mt-1">Gestión de materia prima y alertas de stock</p>
         </div>
-        <button onClick={loadInsumos} className="btn-secondary flex items-center gap-2">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-          Actualizar
-        </button>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          <AsistenciaControl usuario={usuario} />
+          <button onClick={loadInsumos} className="btn-secondary flex items-center justify-center gap-2">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Actualizar
+          </button>
+        </div>
       </div>
 
       {success && (

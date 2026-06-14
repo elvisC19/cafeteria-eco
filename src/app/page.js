@@ -17,6 +17,11 @@ export default function HomePage() {
   const [pedidoExitoso, setPedidoExitoso] = useState(null);
   const [error, setError] = useState('');
   const [mounted, setMounted] = useState(false);
+  const [clienteNombre, setClienteNombre] = useState('');
+  const [clienteTelefono, setClienteTelefono] = useState('');
+  const [nitFactura, setNitFactura] = useState('');
+  const [razonSocialFactura, setRazonSocialFactura] = useState('');
+  const [horaRecojo, setHoraRecojo] = useState('');
 
   useEffect(() => {
     setMounted(true);
@@ -99,6 +104,12 @@ export default function HomePage() {
     if (!tipoServicio) { setError('Seleccione el tipo de servicio.'); return; }
     if (tipoServicio === 'Comer en el Lugar' && !numeroMesa) { setError('Ingrese su número de mesa.'); return; }
     if (carrito.length === 0) { setError('El carrito está vacío.'); return; }
+    if (!clienteNombre.trim()) { setError('Por favor, ingrese su nombre completo.'); return; }
+    if (!clienteTelefono.trim()) { setError('Por favor, ingrese su número de teléfono.'); return; }
+    if (tipoServicio === 'Para Llevar / Recoger' && metodoPago === 'Efectivo' && !horaRecojo.trim()) {
+      setError('Por favor, indique la hora aproximada de recogida.');
+      return;
+    }
 
     setEnviando(true);
     setError('');
@@ -120,6 +131,11 @@ export default function HomePage() {
           tipo_servicio: tipoServicio,
           id_mesa: mesaId,
           metodo_pago: metodoPago,
+          cliente_nombre: clienteNombre,
+          cliente_telefono: clienteTelefono,
+          nit_factura: nitFactura || '0',
+          razon_social_factura: razonSocialFactura || clienteNombre,
+          hora_recojo: tipoServicio === 'Para Llevar / Recoger' ? horaRecojo : null,
           items: carrito.map(i => ({
             id_producto: i.id_producto,
             cantidad: i.qty,
@@ -222,42 +238,77 @@ export default function HomePage() {
   if (pedidoExitoso) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--color-bg-card)] p-4 text-[var(--color-text-primary)] selection:bg-[var(--color-cta)] selection:text-white select-none">
-        <div className="bg-white border border-[var(--color-border-warm)] rounded-xl p-8 max-w-md w-full text-center animate-slide-up relative border-t-8 border-[var(--color-success)] shadow-lg">
-          <div className="w-16 h-16 bg-[rgba(61,107,71,0.08)] rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl text-[var(--color-success)] font-bold">✓</span>
+        <div className="bg-white border border-[var(--color-border-warm)] rounded-xl p-8 max-w-md w-full text-center animate-slide-up relative border-t-8 border-[var(--color-gold)] shadow-lg">
+          <div className="w-16 h-16 bg-[rgba(184,134,11,0.08)] rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-3xl text-[var(--color-gold)] font-bold">⏱</span>
           </div>
           
           <h2 className="text-2xl font-bold text-[var(--color-text-primary)] mb-2" style={{ fontFamily: 'var(--font-serif)' }}>
-            ¡Pedido Enviado!
+            ¡Pedido Registrado!
           </h2>
-          <p className="text-sm text-[var(--color-text-secondary)] mb-6 font-medium">Tu orden se está preparando en la barra de especialidad.</p>
+          <p className="text-xs text-[var(--color-text-secondary)] mb-6 font-medium">Tu orden ha sido enviada a caja y está en espera de validación por el cajero.</p>
 
-          <div className="bg-[var(--color-bg-card)] border border-[var(--color-border-warm)] rounded-xl p-5 mb-6 text-left shadow-sm">
+          <div className="bg-[var(--color-bg-card)] border border-[var(--color-border-warm)] rounded-xl p-5 mb-6 text-left shadow-sm space-y-2">
             <div className="flex justify-between items-center mb-3">
-              <span className="text-[11px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider">Canal de Entrega</span>
-              <span className="text-[10px] font-bold px-2 py-1 rounded bg-[var(--color-success)]/10 text-[var(--color-success)]">
-                {pedidoExitoso.tipo_servicio}
+              <span className="text-[11px] text-[var(--color-text-muted)] uppercase font-bold tracking-wider">Estado de Validación</span>
+              <span className="text-[10px] font-bold px-2 py-1 rounded bg-[var(--color-gold)]/10 text-[var(--color-gold)] animate-pulse">
+                Espera Validación
               </span>
             </div>
-            <p className="text-4xl font-black text-[var(--color-text-primary)] tracking-tight">#{pedidoExitoso.id_pedido}</p>
             
-            <div className="border-t border-[var(--color-border-warm)]/60 my-3 pt-3 flex justify-between text-sm">
-              <span className="text-[var(--color-text-secondary)] font-medium">Mesa:</span>
-              <span className="font-bold text-[var(--color-text-primary)]">{pedidoExitoso.id_mesa ? `Mesa ${numeroMesa || pedidoExitoso.id_mesa}` : 'Para Llevar'}</span>
+            <p className="text-3xl font-black text-[var(--color-text-primary)] tracking-tight">#{pedidoExitoso.id_pedido}</p>
+            
+            <div className="border-t border-[var(--color-border-warm)]/60 my-2 pt-2 flex justify-between text-xs">
+              <span className="text-[var(--color-text-secondary)]">Cliente:</span>
+              <span className="font-semibold text-[var(--color-text-primary)]">{pedidoExitoso.cliente_nombre}</span>
             </div>
+
+            <div className="flex justify-between text-xs">
+              <span className="text-[var(--color-text-secondary)]">Teléfono:</span>
+              <span className="font-semibold text-[var(--color-text-primary)]">{pedidoExitoso.cliente_telefono}</span>
+            </div>
+
+            <div className="flex justify-between text-xs">
+              <span className="text-[var(--color-text-secondary)]">Razón Social:</span>
+              <span className="font-semibold text-[var(--color-text-primary)]">{pedidoExitoso.razon_social_factura}</span>
+            </div>
+
+            <div className="flex justify-between text-xs">
+              <span className="text-[var(--color-text-secondary)]">NIT/CI:</span>
+              <span className="font-semibold text-[var(--color-text-primary)]">{pedidoExitoso.nit_factura}</span>
+            </div>
+
+            <div className="flex justify-between text-xs">
+              <span className="text-[var(--color-text-secondary)]">Canal:</span>
+              <span className="font-semibold text-[var(--color-text-primary)]">{pedidoExitoso.tipo_servicio}</span>
+            </div>
+
+            {pedidoExitoso.id_mesa && (
+              <div className="flex justify-between text-xs">
+                <span className="text-[var(--color-text-secondary)] font-medium">Mesa:</span>
+                <span className="font-bold text-[var(--color-text-primary)]">Mesa {numeroMesa || pedidoExitoso.id_mesa}</span>
+              </div>
+            )}
+
+            {pedidoExitoso.hora_recojo && (
+              <div className="flex justify-between text-xs text-[var(--color-cta)] font-semibold">
+                <span>Hora Recojo Aprox:</span>
+                <span>{pedidoExitoso.hora_recojo}</span>
+              </div>
+            )}
             
-            <div className="flex justify-between text-sm">
-              <span className="text-[var(--color-text-secondary)] font-medium">Total a Pagar:</span>
-              <span className="font-bold text-[var(--color-text-primary)]">Bs. {parseFloat(pedidoExitoso.total_pago).toFixed(2)}</span>
+            <div className="border-t border-[var(--color-border-warm)]/60 pt-2 flex justify-between text-sm">
+              <span className="text-[var(--color-text-secondary)] font-bold">Total a Pagar:</span>
+              <span className="font-bold text-[var(--color-gold)]">Bs. {parseFloat(pedidoExitoso.total_pago).toFixed(2)}</span>
             </div>
           </div>
 
-          {pedidoExitoso.metodo_pago === 'Pago QR Simple' && (
+          {pedidoExitoso.metodo_pago === 'Pago QR Simple' ? (
             <div className="mb-6 p-4 bg-white rounded-xl border border-[var(--color-border-warm)] flex flex-col items-center shadow-sm">
-              <p className="text-xs font-semibold text-[var(--color-text-muted)] mb-3">Escanea el código QR para pagar su orden</p>
+              <p className="text-[11px] font-semibold text-[var(--color-text-muted)] mb-3">Escanea el código QR y realiza tu transferencia</p>
               
-              <div className="w-44 h-44 bg-neutral-100 p-2 rounded-xl flex items-center justify-center border border-dashed border-[var(--color-border-warm)] relative">
-                <svg className="w-40 h-40 text-[var(--color-text-primary)]" fill="currentColor" viewBox="0 0 24 24">
+              <div className="w-40 h-40 bg-neutral-100 p-2 rounded-xl flex items-center justify-center border border-dashed border-[var(--color-border-warm)] relative">
+                <svg className="w-36 h-36 text-[var(--color-text-primary)]" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 15h6v6H3v-6zm2 2v2h2v-2H5zm10 2h2v2h-2v-2zm2-2h2v2h-2v-2zm-2-2h2v2h-2v-2zm4 2h2v2h-2v-2zm-2-4h2v2h-2v-2zm-2 0h2v2h-2v-2zm-4-4h2v2h-2V7zm2 2h2v2h-2V9zm-4 2h2v2H9v-2zm6-6h2v2h-2V5zm-2 2h2v2h-2V7zm-2 2h2v2H9V9zm4 4h2v2h-2v-2zm-6 2h2v2H7v-2zm2 2h2v2H9v-2zm2-4h2v2h-2v-2zm2 2h2v2h-2v-2z" />
                 </svg>
                 <div className="absolute w-8 h-8 bg-white border border-[var(--color-border-warm)] rounded-lg flex items-center justify-center">
@@ -265,20 +316,21 @@ export default function HomePage() {
                 </div>
               </div>
               
-              <span className="text-[10px] text-[var(--color-success)] bg-[var(--color-success)]/10 px-2.5 py-0.5 rounded-full font-bold mt-3 animate-pulse">
-                Esperando confirmación bancaria
+              <span className="text-[10px] text-[var(--color-gold)] bg-[var(--color-gold)]/10 px-2.5 py-1 rounded-full font-bold mt-3 animate-pulse">
+                Pago enviado. Verificando en caja...
               </span>
+            </div>
+          ) : (
+            <div className="mb-6 p-4 bg-amber-50/50 rounded-xl border border-amber-200 text-left">
+              <p className="text-xs text-amber-900 leading-relaxed font-medium">
+                👉 **Pago en Efectivo**: Pagarás un total de **Bs. {parseFloat(pedidoExitoso.total_pago).toFixed(2)}** al momento de recoger tu pedido. El cajero te enviará la factura de tu compra por WhatsApp.
+              </p>
             </div>
           )}
 
-          <div className="space-y-2">
-            <button onClick={() => setPedidoExitoso(null)} className="btn-primary w-full py-3.5">
-              Realizar Nueva Compra
-            </button>
-            <Link href="/menu" className="btn-secondary w-full py-3 block text-center">
-              Ver Carta Completa
-            </Link>
-          </div>
+          <p className="text-[11px] text-[var(--color-text-muted)] mb-6">
+            Una vez aprobado, el cajero registrará la factura fiscal SIN y te la enviará por WhatsApp al teléfono **{pedidoExitoso.cliente_telefono}**.
+          </p>
         </div>
       </div>
     );
@@ -569,26 +621,47 @@ export default function HomePage() {
                 return (
                   <div
                     key={prod.id_producto}
-                    className="bg-white border border-[var(--color-border-warm)] rounded-xl p-5 flex flex-col justify-between group hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200"
+                    className="bg-white border border-[var(--color-border-warm)] rounded-xl p-0 flex flex-col justify-between group hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
                   >
                     <div>
-                      {/* Product Header */}
-                      <div className="flex justify-between items-start mb-4">
-                        <span className="p-2.5 bg-[var(--color-bg-card)] rounded-xl group-hover:scale-105 transition-transform duration-200">
-                          {renderCategoryIcon(prod.categoria)}
-                        </span>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border border-[var(--color-border-warm)] bg-[var(--color-bg-card)] text-[var(--color-text-secondary)]">
-                          {prod.categoria}
-                        </span>
+                      {/* Product Image */}
+                      <div className="w-full h-40 bg-[var(--color-bg-card)] relative overflow-hidden flex items-center justify-center border-b border-[var(--color-border-warm)]/40">
+                        {prod.imagen_url ? (
+                          <img
+                            src={prod.imagen_url}
+                            alt={prod.nombre_producto}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              // show fallback
+                              const fallback = e.target.parentNode.querySelector('.fallback-icon');
+                              if (fallback) fallback.classList.remove('hidden');
+                            }}
+                          />
+                        ) : null}
+                        <div className={`fallback-icon absolute inset-0 flex items-center justify-center ${prod.imagen_url ? 'hidden' : ''}`}>
+                          <span className="p-3 bg-white/90 rounded-xl shadow-sm border border-[var(--color-border-warm)]/30">
+                            {renderCategoryIcon(prod.categoria)}
+                          </span>
+                        </div>
                       </div>
-                      
-                      {/* Product Name */}
-                      <h4 className="font-bold text-base text-[var(--color-text-primary)] mb-1 group-hover:text-[var(--color-cta)] transition-colors">
-                        {prod.nombre_producto}
-                      </h4>
-                      <p className="text-xs text-[var(--color-text-muted)] line-clamp-2 leading-relaxed mb-5">
-                        Ingredientes selectos y preparación sofisticada. Café de especialidad premium.
-                      </p>
+
+                      <div className="p-5">
+                        {/* Product Category Badge */}
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-[9px] font-bold px-2 py-0.5 rounded-full border border-[var(--color-border-warm)] bg-[var(--color-bg-card)] text-[var(--color-text-secondary)]">
+                            {prod.categoria}
+                          </span>
+                        </div>
+                        
+                        {/* Product Name */}
+                        <h4 className="font-bold text-sm text-[var(--color-text-primary)] mb-1 group-hover:text-[var(--color-cta)] transition-colors">
+                          {prod.nombre_producto}
+                        </h4>
+                        <p className="text-[11px] text-[var(--color-text-muted)] line-clamp-2 leading-relaxed">
+                          Ingredientes selectos y preparación sofisticada. Café de especialidad premium de Charcas Capital.
+                        </p>
+                      </div>
                     </div>
 
                     {/* Product Footer */}
@@ -762,6 +835,83 @@ export default function HomePage() {
                       ))}
                     </div>
                   </div>
+
+                  {/* Datos del Cliente */}
+                  <div className="space-y-3 pt-3 border-t border-[var(--color-border-warm)]/60">
+                    <p className="text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider">Datos de Contacto</p>
+                    <div className="space-y-2">
+                      <input
+                        type="text"
+                        className="input-field text-xs"
+                        placeholder="Nombre Completo (ej: Juan Perez)"
+                        value={clienteNombre}
+                        onChange={(e) => { setClienteNombre(e.target.value); setError(''); }}
+                      />
+                      <input
+                        type="text"
+                        className="input-field text-xs"
+                        placeholder="Número de Teléfono (ej: 78945612)"
+                        value={clienteTelefono}
+                        onChange={(e) => { setClienteTelefono(e.target.value); setError(''); }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Facturación */}
+                  <div className="space-y-3 pt-3 border-t border-[var(--color-border-warm)]/60">
+                    <p className="text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider">Datos de Facturación</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <input
+                        type="text"
+                        className="input-field text-xs"
+                        placeholder="Razón Social (opcional)"
+                        value={razonSocialFactura}
+                        onChange={(e) => setRazonSocialFactura(e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        className="input-field text-xs"
+                        placeholder="NIT o CI (opcional)"
+                        value={nitFactura}
+                        onChange={(e) => setNitFactura(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Detalle para llevar */}
+                  {tipoServicio === 'Para Llevar / Recoger' && metodoPago === 'Efectivo' && (
+                    <div className="bg-[var(--color-bg-card)] rounded-xl p-4 border border-[var(--color-border-warm)] space-y-2 animate-fade-in">
+                      <label className="block text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wider">
+                        ¿A qué hora pasará a recoger?
+                      </label>
+                      <input
+                        type="text"
+                        className="input-field text-center text-sm font-bold border-[var(--color-border-warm)] bg-white"
+                        placeholder="Ej: 15:30"
+                        value={horaRecojo}
+                        onChange={(e) => { setHoraRecojo(e.target.value); setError(''); }}
+                      />
+                      <p className="text-[10px] text-[var(--color-text-muted)] italic">Pagarás en efectivo en caja al momento de retirar tu pedido.</p>
+                    </div>
+                  )}
+
+                  {/* QR Code simple instructions */}
+                  {metodoPago === 'Pago QR Simple' && (
+                    <div className="bg-blue-50/50 rounded-xl p-4 border border-blue-100 text-center space-y-2 animate-fade-in">
+                      <p className="text-xs font-bold text-blue-900">Código QR de Pago Simple</p>
+                      
+                      <div className="w-36 h-36 bg-white p-2 rounded-xl flex items-center justify-center border border-dashed border-blue-300 mx-auto relative shadow-sm">
+                        <svg className="w-32 h-32 text-blue-950" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 15h6v6H3v-6zm2 2v2h2v-2H5zm10 2h2v2h-2v-2zm2-2h2v2h-2v-2zm-2-2h2v2h-2v-2zm4 2h2v2h-2v-2zm-2-4h2v2h-2v-2zm-2 0h2v2h-2v-2zm-4-4h2v2h-2V7zm2 2h2v2h-2V9zm-4 2h2v2H9v-2zm6-6h2v2h-2V5zm-2 2h2v2h-2V7zm-2 2h2v2H9V9zm4 4h2v2h-2v-2zm-6 2h2v2H7v-2zm2 2h2v2H9v-2zm2-4h2v2h-2v-2zm2 2h2v2h-2v-2z" />
+                        </svg>
+                        <div className="absolute w-6 h-6 bg-white border border-blue-200 rounded flex items-center justify-center">
+                          <span className="text-[8px] font-bold text-blue-950">CC</span>
+                        </div>
+                      </div>
+                      
+                      <p className="text-[10px] text-blue-950 font-medium">Realice la transferencia de **Bs. {total.toFixed(2)}** y luego confirme su pedido.</p>
+                    </div>
+                  )}
 
                   {/* Cart Items List */}
                   <div className="space-y-3 pt-4 border-t border-[var(--color-border-warm)]/60">

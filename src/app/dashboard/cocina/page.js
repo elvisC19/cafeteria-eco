@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { pedidosAPI } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
+import AsistenciaControl from '@/components/AsistenciaControl';
 
 export default function CocinaPage() {
   const { usuario } = useAuth();
@@ -83,7 +84,7 @@ export default function CocinaPage() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-[var(--color-border-warm)] pb-5 gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[var(--text-primary)]" style={{ fontFamily: 'var(--font-playfair)' }}>
             {usuario?.rol === 'Barista' ? 'Cola de Barismo' : usuario?.rol === 'Cocina' ? 'Cola de Cocina' : 'Cola de Pedidos'}
@@ -92,12 +93,15 @@ export default function CocinaPage() {
             FIFO — {totalEnCola} pedidos activos en total • Auto-refresh cada 5 segundos
           </p>
         </div>
-        <button onClick={loadCola} className="btn-secondary flex items-center gap-2">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
-          Actualizar
-        </button>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+          <AsistenciaControl usuario={usuario} />
+          <button onClick={loadCola} className="btn-secondary flex items-center justify-center gap-2">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Actualizar
+          </button>
+        </div>
       </div>
 
       {/* Tabs Filtro de Categoría */}

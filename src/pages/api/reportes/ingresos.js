@@ -22,7 +22,7 @@ export default async function handler(req, res) {
         COALESCE(SUM(CASE WHEN metodo_pago = 'Efectivo' AND estado_pago = 'Pagado' THEN total_pago ELSE 0 END), 0) as efectivo,
         COALESCE(SUM(CASE WHEN metodo_pago = 'Pago QR Simple' AND estado_pago = 'Pagado' THEN total_pago ELSE 0 END), 0) as qr
       FROM pedidos
-      WHERE DATE(fecha_hora AT TIME ZONE 'America/La_Paz') = CURRENT_DATE`,
+      WHERE DATE(fecha_hora AT TIME ZONE 'America/La_Paz') = DATE(NOW() AT TIME ZONE 'America/La_Paz')`,
       []
     );
 
@@ -61,7 +61,7 @@ export default async function handler(req, res) {
     const porEstado = await query(
       `SELECT estado_pedido, COUNT(*) as cantidad
        FROM pedidos
-       WHERE DATE(fecha_hora AT TIME ZONE 'America/La_Paz') = CURRENT_DATE
+       WHERE DATE(fecha_hora AT TIME ZONE 'America/La_Paz') = DATE(NOW() AT TIME ZONE 'America/La_Paz')
        GROUP BY estado_pedido`,
       []
     );

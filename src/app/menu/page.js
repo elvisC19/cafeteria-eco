@@ -17,6 +17,11 @@ export default function MenuPublicoPage() {
   const [pedidoExitoso, setPedidoExitoso] = useState(null);
   const [error, setError] = useState('');
   const [mounted, setMounted] = useState(false);
+  const [clienteNombre, setClienteNombre] = useState('');
+  const [clienteTelefono, setClienteTelefono] = useState('');
+  const [nitFactura, setNitFactura] = useState('');
+  const [razonSocialFactura, setRazonSocialFactura] = useState('');
+  const [horaRecojo, setHoraRecojo] = useState('');
 
   useEffect(() => {
     setMounted(true);
@@ -63,6 +68,12 @@ export default function MenuPublicoPage() {
     if (!tipoServicio) { setError('Seleccione el canal de distribución.'); return; }
     if (tipoServicio === 'Comer en el Lugar' && !numeroMesa) { setError('Ingrese el número de mesa.'); return; }
     if (carrito.length === 0) { setError('Agregue productos al carrito.'); return; }
+    if (!clienteNombre.trim()) { setError('Por favor, ingrese su nombre completo.'); return; }
+    if (!clienteTelefono.trim()) { setError('Por favor, ingrese su número de teléfono.'); return; }
+    if (tipoServicio === 'Para Llevar / Recoger' && metodoPago === 'Efectivo' && !horaRecojo.trim()) {
+      setError('Por favor, indique la hora aproximada de recogida.');
+      return;
+    }
 
     setEnviando(true);
     setError('');
@@ -84,6 +95,11 @@ export default function MenuPublicoPage() {
           tipo_servicio: tipoServicio,
           id_mesa: mesaId,
           metodo_pago: metodoPago,
+          cliente_nombre: clienteNombre,
+          cliente_telefono: clienteTelefono,
+          nit_factura: nitFactura || '0',
+          razon_social_factura: razonSocialFactura || clienteNombre,
+          hora_recojo: tipoServicio === 'Para Llevar / Recoger' ? horaRecojo : null,
           items: carrito.map(i => ({
             id_producto: i.id_producto,
             cantidad: i.qty,
@@ -135,38 +151,73 @@ export default function MenuPublicoPage() {
       <div className="min-h-screen flex items-center justify-center bg-[#FBF3E8] px-4 py-8 text-[#3B2B24]">
         <div className="glass-card shadow-neomorph-out p-8 max-w-md w-full text-center animate-slide-up border-t-8 border-[#607C5B] relative bg-white">
           <div className="w-16 h-16 bg-[#607C5B]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl text-[#607C5B]">✓</span>
+            <span className="text-3xl text-[#607C5B]">⏱</span>
           </div>
 
           <h2 className="text-2xl font-bold text-[#3B2B24] mb-2" style={{ fontFamily: 'var(--font-playfair), serif' }}>
             ¡Pedido Registrado!
           </h2>
-          <p className="text-[#6B564C] text-sm mb-6">Su orden ha sido enviada directamente a la cocina.</p>
+          <p className="text-[#6B564C] text-xs mb-6">Tu orden ha sido enviada a caja y está en espera de validación por el cajero.</p>
           
-          <div className="bg-[#F3EAD8] rounded-2xl p-5 mb-6 text-left border border-[#E6DBC8] shadow-neomorph-in">
+          <div className="bg-[#F3EAD8] rounded-2xl p-5 mb-6 text-left border border-[#E6DBC8] shadow-neomorph-in space-y-2 text-xs">
             <div className="flex justify-between items-center mb-3">
-              <span className="text-xs text-[#8E7A6E] uppercase font-bold tracking-wider">Número de Pedido</span>
-              <span className="text-xs font-bold px-2 py-0.5 rounded bg-[#607C5B]/20 text-[#607C5B]">
-                {pedidoExitoso.tipo_servicio}
+              <span className="text-[10px] text-[#8E7A6E] uppercase font-bold tracking-wider">Estado de Validación</span>
+              <span className="text-xs font-bold px-2 py-0.5 rounded bg-[#607C5B]/20 text-[#607C5B] animate-pulse">
+                Espera Validación
               </span>
             </div>
-            <p className="text-4xl font-extrabold text-[#3B2B24] tracking-tight">#{pedidoExitoso.id_pedido}</p>
             
-            <div className="border-t border-[#E6DBC8] my-3 pt-3 flex justify-between text-sm">
-              <span className="text-[#6B564C]">Mesa:</span>
-              <span className="font-bold">{pedidoExitoso.id_mesa ? `Mesa ${numeroMesa || pedidoExitoso.id_mesa}` : 'Para Llevar'}</span>
+            <p className="text-3xl font-extrabold text-[#3B2B24] tracking-tight">#{pedidoExitoso.id_pedido}</p>
+            
+            <div className="border-t border-[#E6DBC8] my-2 pt-2 flex justify-between">
+              <span className="text-[#6B564C]">Cliente:</span>
+              <span className="font-bold">{pedidoExitoso.cliente_nombre}</span>
             </div>
+
+            <div className="flex justify-between">
+              <span className="text-[#6B564C]">Teléfono:</span>
+              <span className="font-bold">{pedidoExitoso.cliente_telefono}</span>
+            </div>
+
+            <div className="flex justify-between">
+              <span className="text-[#6B564C]">Razón Social:</span>
+              <span className="font-bold">{pedidoExitoso.razon_social_factura}</span>
+            </div>
+
+            <div className="flex justify-between">
+              <span className="text-[#6B564C]">NIT/CI:</span>
+              <span className="font-bold">{pedidoExitoso.nit_factura}</span>
+            </div>
+
+            <div className="flex justify-between">
+              <span className="text-[#6B564C]">Canal:</span>
+              <span className="font-bold">{pedidoExitoso.tipo_servicio}</span>
+            </div>
+
+            {pedidoExitoso.id_mesa && (
+              <div className="flex justify-between">
+                <span className="text-[#6B564C]">Mesa:</span>
+                <span className="font-bold">Mesa {numeroMesa || pedidoExitoso.id_mesa}</span>
+              </div>
+            )}
+
+            {pedidoExitoso.hora_recojo && (
+              <div className="flex justify-between text-[#607C5B] font-bold">
+                <span>Hora Recojo Aprox:</span>
+                <span>{pedidoExitoso.hora_recojo}</span>
+              </div>
+            )}
             
-            <div className="flex justify-between text-sm">
-              <span className="text-[#6B564C]">Total:</span>
+            <div className="border-t border-[#E6DBC8] pt-2 flex justify-between text-sm">
+              <span className="text-[#6B564C] font-bold">Total:</span>
               <span className="font-bold text-[#3B2B24]">Bs. {parseFloat(pedidoExitoso.total_pago).toFixed(2)}</span>
             </div>
           </div>
 
           {/* QR Code Section */}
-          {pedidoExitoso.metodo_pago === 'Pago QR Simple' && (
+          {pedidoExitoso.metodo_pago === 'Pago QR Simple' ? (
             <div className="mb-6 p-4 bg-white rounded-2xl border border-[#E6DBC8] flex flex-col items-center shadow-sm">
-              <p className="text-xs font-semibold text-[#8E7A6E] mb-3">Escanee el código QR para pagar su orden</p>
+              <p className="text-xs font-semibold text-[#8E7A6E] mb-3 font-medium">Escanea el código QR y realiza tu transferencia</p>
               <div className="w-40 h-40 bg-neutral-100 p-2 rounded-xl flex items-center justify-center border border-dashed border-[#8A6F57] relative">
                 <svg className="w-36 h-36 text-[#3B2B24]" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 15h6v6H3v-6zm2 2v2h2v-2H5zm10 2h2v2h-2v-2zm2-2h2v2h-2v-2zm-2-2h2v2h-2v-2zm4 2h2v2h-2v-2zm-2-4h2v2h-2v-2zm-2 0h2v2h-2v-2zm-4-4h2v2h-2V7zm2 2h2v2h-2V9zm-4 2h2v2H9v-2zm6-6h2v2h-2V5zm-2 2h2v2h-2V7zm-2 2h2v2H9V9zm4 4h2v2h-2v-2zm-6 2h2v2H7v-2zm2 2h2v2H9v-2zm2-4h2v2h-2v-2zm2 2h2v2h-2v-2z" />
@@ -175,12 +226,22 @@ export default function MenuPublicoPage() {
                   <span className="text-xs font-bold text-[#3B2B24]">CC</span>
                 </div>
               </div>
-              <span className="text-[10px] text-[#607C5B] bg-[#607C5B]/10 px-2 py-0.5 rounded-full font-bold mt-2 animate-pulse">
-                Esperando pago simple QR
+              <span className="text-[10px] text-[#607C5B] bg-[#607C5B]/10 px-2.5 py-1 rounded-full font-bold mt-3 animate-pulse">
+                Pago enviado. Verificando en caja...
               </span>
             </div>
+          ) : (
+            <div className="mb-6 p-4 bg-amber-50/50 rounded-xl border border-amber-200 text-left">
+              <p className="text-xs text-amber-900 leading-relaxed font-medium">
+                👉 **Pago en Efectivo**: Pagarás un total de **Bs. {parseFloat(pedidoExitoso.total_pago).toFixed(2)}** al momento de recoger tu pedido. El cajero te enviará la factura de tu compra por WhatsApp.
+              </p>
+            </div>
           )}
-          
+
+          <p className="text-[11px] text-[#8E7A6E] mb-6">
+            Una vez aprobado, el cajero registrará la factura fiscal SIN y te la enviará por WhatsApp al teléfono **{pedidoExitoso.cliente_telefono}**.
+          </p>
+
           <button onClick={() => setPedidoExitoso(null)} className="btn-primary w-full py-3 shadow-neomorph-hover">
             Hacer Otro Pedido
           </button>
@@ -295,29 +356,49 @@ export default function MenuPublicoPage() {
               return (
                 <div
                   key={prod.id_producto}
-                  className="bento-card p-5 flex flex-col justify-between group bg-white"
+                  className="bento-card p-0 flex flex-col justify-between group bg-white overflow-hidden"
                 >
                   <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="p-1.5 bg-[#FBF3E8] rounded-xl flex items-center justify-center">
-                        <svg className="w-6 h-6 text-[#8A6F57]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 5c0-1.1.9-2 2-2h8a2 2 0 012 2v6a5 5 0 01-5 5H9a5 5 0 01-5-5V5z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 7h1a2 2 0 012 2v2a2 2 0 01-2 2h-1M6 19h12" />
-                        </svg>
-                      </span>
-                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${catColors[prod.categoria] || 'bg-stone-100 text-stone-800'}`}>
-                        {prod.categoria}
-                      </span>
+                    {/* Product Image */}
+                    <div className="w-full h-40 bg-[#FBF3E8] relative overflow-hidden flex items-center justify-center border-b border-[#E6DBC8]/50">
+                      {prod.imagen_url ? (
+                        <img
+                          src={prod.imagen_url}
+                          alt={prod.nombre_producto}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                            const fallback = e.target.parentNode.querySelector('.fallback-icon');
+                            if (fallback) fallback.classList.remove('hidden');
+                          }}
+                        />
+                      ) : null}
+                      <div className={`fallback-icon absolute inset-0 flex items-center justify-center ${prod.imagen_url ? 'hidden' : ''}`}>
+                        <span className="p-3 bg-white/90 rounded-xl shadow-sm border border-[#E6DBC8]/30 animate-pulse">
+                          <svg className="w-6 h-6 text-[#8A6F57]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 5c0-1.1.9-2 2-2h8a2 2 0 012 2v6a5 5 0 01-5 5H9a5 5 0 01-5-5V5z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 7h1a2 2 0 012 2v2a2 2 0 01-2 2h-1M6 19h12" />
+                          </svg>
+                        </span>
+                      </div>
                     </div>
-                    <h3 className="text-sm font-bold text-[#3B2B24] mb-1 group-hover:text-[#8A6F57] transition-colors">
-                      {prod.nombre_producto}
-                    </h3>
-                    <p className="text-[11px] text-[#8E7A6E] leading-relaxed line-clamp-2 mb-4">
-                      Granos selectos e insumos frescos de primera calidad para una taza perfecta.
-                    </p>
+
+                    <div className="p-5">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${catColors[prod.categoria] || 'bg-stone-100 text-stone-800'}`}>
+                          {prod.categoria}
+                        </span>
+                      </div>
+                      <h3 className="text-sm font-bold text-[#3B2B24] mb-1 group-hover:text-[#8A6F57] transition-colors">
+                        {prod.nombre_producto}
+                      </h3>
+                      <p className="text-[11px] text-[#8E7A6E] leading-relaxed line-clamp-2">
+                        Granos selectos e insumos frescos de primera calidad para una taza perfecta.
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-4 border-t border-[#FBF3E8] mt-auto">
+                  <div className="flex items-center justify-between p-5 pt-4 border-t border-[#FBF3E8] mt-auto">
                     <div>
                       <span className="text-[9px] text-[#8E7A6E] block font-bold uppercase tracking-wider">Precio</span>
                       <span className="text-base font-extrabold text-[#3B2B24]">
@@ -460,6 +541,83 @@ export default function MenuPublicoPage() {
                       ))}
                     </div>
                   </div>
+
+                  {/* Datos del Cliente */}
+                  <div className="space-y-3 pt-3 border-t border-[#E6DBC8]/40">
+                    <p className="text-xs font-bold text-[#8A6F57] uppercase tracking-wider">Datos de Contacto</p>
+                    <div className="space-y-2">
+                      <input
+                        type="text"
+                        className="input-field text-xs"
+                        placeholder="Nombre Completo (ej: Juan Perez)"
+                        value={clienteNombre}
+                        onChange={(e) => { setClienteNombre(e.target.value); setError(''); }}
+                      />
+                      <input
+                        type="text"
+                        className="input-field text-xs"
+                        placeholder="Número de Teléfono (ej: 78945612)"
+                        value={clienteTelefono}
+                        onChange={(e) => { setClienteTelefono(e.target.value); setError(''); }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Facturación */}
+                  <div className="space-y-3 pt-3 border-t border-[#E6DBC8]/40">
+                    <p className="text-xs font-bold text-[#8A6F57] uppercase tracking-wider">Datos de Facturación</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      <input
+                        type="text"
+                        className="input-field text-xs"
+                        placeholder="Razón Social (opcional)"
+                        value={razonSocialFactura}
+                        onChange={(e) => setRazonSocialFactura(e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        className="input-field text-xs"
+                        placeholder="NIT o CI (opcional)"
+                        value={nitFactura}
+                        onChange={(e) => setNitFactura(e.target.value)}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Detalle para llevar */}
+                  {tipoServicio === 'Para Llevar / Recoger' && metodoPago === 'Efectivo' && (
+                    <div className="bg-[#FBF3E8] rounded-xl p-4 border border-[#E6DBC8] space-y-2 animate-fade-in shadow-neomorph-in">
+                      <label className="block text-xs font-bold text-[#8A6F57] uppercase tracking-wider">
+                        ¿A qué hora pasará a recoger?
+                      </label>
+                      <input
+                        type="text"
+                        className="input-field text-center text-sm font-bold border-[#E6DBC8] bg-white"
+                        placeholder="Ej: 15:30"
+                        value={horaRecojo}
+                        onChange={(e) => { setHoraRecojo(e.target.value); setError(''); }}
+                      />
+                      <p className="text-[10px] text-[#8E7A6E] italic">Pagarás en efectivo en caja al momento de retirar tu pedido.</p>
+                    </div>
+                  )}
+
+                  {/* QR Code simple instructions */}
+                  {metodoPago === 'Pago QR Simple' && (
+                    <div className="bg-blue-50/50 rounded-xl p-4 border border-blue-100 text-center space-y-2 animate-fade-in">
+                      <p className="text-xs font-bold text-blue-900">Código QR de Pago Simple</p>
+                      
+                      <div className="w-36 h-36 bg-white p-2 rounded-xl flex items-center justify-center border border-dashed border-blue-300 mx-auto relative shadow-sm">
+                        <svg className="w-32 h-32 text-blue-950" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 15h6v6H3v-6zm2 2v2h2v-2H5zm10 2h2v2h-2v-2zm2-2h2v2h-2v-2zm-2-2h2v2h-2v-2zm4 2h2v2h-2v-2zm-2-4h2v2h-2v-2zm-2 0h2v2h-2v-2zm-4-4h2v2h-2V7zm2 2h2v2h-2V9zm-4 2h2v2H9v-2zm6-6h2v2h-2V5zm-2 2h2v2h-2V7zm-2 2h2v2H9V9zm4 4h2v2h-2v-2zm-6 2h2v2H7v-2zm2 2h2v2H9v-2zm2-4h2v2h-2v-2zm2 2h2v2h-2v-2z" />
+                        </svg>
+                        <div className="absolute w-6 h-6 bg-white border border-blue-200 rounded flex items-center justify-center">
+                          <span className="text-[8px] font-bold text-blue-950">CC</span>
+                        </div>
+                      </div>
+                      
+                      <p className="text-[10px] text-blue-950 font-medium">Realice la transferencia de **Bs. {total.toFixed(2)}** y luego confirme su pedido.</p>
+                    </div>
+                  )}
 
                   {/* Cart Items */}
                   <div className="space-y-3 pt-3 border-t border-[#E6DBC8]/40">

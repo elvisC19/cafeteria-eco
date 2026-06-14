@@ -45,7 +45,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { id_usuario, id_mesa, tipo_servicio, metodo_pago, items } = req.body;
+    const { id_usuario, id_mesa, tipo_servicio, metodo_pago, items, cliente_nombre, cliente_telefono, nit_factura, razon_social_factura, hora_recojo } = req.body;
 
     // Validaciones
     if (!tipo_servicio || !items || !Array.isArray(items) || items.length === 0) {
@@ -120,11 +120,24 @@ export default async function handler(req, res) {
       }
 
       // Insertar cabecera del pedido
+      const estadoPedido = id_usuario ? 'Pendiente' : 'Espera Validación';
       const pedidoResult = await client.query(
-        `INSERT INTO pedidos (id_usuario, id_mesa, tipo_servicio, metodo_pago, total_pago, estado_pedido, estado_pago, fecha_hora)
-         VALUES ($1, $2, $3, $4, $5, 'Pendiente', 'No Pagado', NOW())
+        `INSERT INTO pedidos (id_usuario, id_mesa, tipo_servicio, metodo_pago, total_pago, estado_pedido, estado_pago, fecha_hora, cliente_nombre, cliente_telefono, nit_factura, razon_social_factura, hora_recojo)
+         VALUES ($1, $2, $3, $4, $5, $6, 'No Pagado', NOW(), $7, $8, $9, $10, $11)
          RETURNING *`,
-        [id_usuario || null, mesaId, tipo_servicio, metodo_pago || null, totalPago]
+        [
+          id_usuario || null,
+          mesaId,
+          tipo_servicio,
+          metodo_pago || null,
+          totalPago,
+          estadoPedido,
+          cliente_nombre || null,
+          cliente_telefono || null,
+          nit_factura || null,
+          razon_social_factura || null,
+          hora_recojo || null
+        ]
       );
 
       const pedido = pedidoResult.rows[0];

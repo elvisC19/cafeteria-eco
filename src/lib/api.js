@@ -38,6 +38,11 @@ export const authAPI = {
 export const productosAPI = {
   listar: (disponible = true) =>
     apiFetch(`/api/productos?disponible=${disponible}`),
+  actualizarImagenUrl: (id_producto, imagen_url) =>
+    apiFetch('/api/productos', {
+      method: 'PATCH',
+      body: JSON.stringify({ id_producto, imagen_url }),
+    }),
 };
 
 // ============ PEDIDOS ============

@@ -11,8 +11,28 @@ export default async function handler(req, res) {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
+  if (req.method === 'PATCH') {
+    try {
+      const { id_producto, imagen_url } = req.body;
+      if (!id_producto) {
+        return res.status(400).json({ error: 'Se requiere id_producto.' });
+      }
+      const result = await query(
+        'UPDATE productos SET imagen_url = $1 WHERE id_producto = $2 RETURNING *',
+        [imagen_url || null, id_producto]
+      );
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: 'Producto no encontrado.' });
+      }
+      return res.status(200).json({ success: true, producto: result.rows[0] });
+    } catch (error) {
+      console.error('[PATCH Productos Error]:', error);
+      return res.status(500).json({ error: 'Error al actualizar el producto.', detalle: error.message });
+    }
+  }
+
   if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Método no permitido.' });
+    return res.status(405).json({ error: 'Método no permitido. Use GET o PATCH.' });
   }
 
   try {

@@ -70,26 +70,65 @@ export default async function handler(req, res) {
     }
   }
 
-  // PATCH - Actualizar estado de un pedido en la cola
+  // PATCH - Actualizar estado o datos de facturación de un pedido
   if (req.method === 'PATCH') {
     try {
-      const { id_pedido, estado_pedido } = req.body;
+      const { id_pedido, estado_pedido, estado_pago, codigo_control, nit_emisor, numero_factura, qr_factura, leyenda_factura } = req.body;
 
-      if (!id_pedido || !estado_pedido) {
-        return res.status(400).json({ error: 'Se requieren id_pedido y estado_pedido.' });
+      if (!id_pedido) {
+        return res.status(400).json({ error: 'Se requiere id_pedido.' });
       }
 
-      const validEstados = ['Pendiente', 'En Preparación', 'Listo', 'Entregado', 'Cancelado'];
-      if (!validEstados.includes(estado_pedido)) {
+      // Validar estado si viene
+      const validEstados = ['Espera Validación', 'Pendiente', 'En Preparación', 'Listo', 'Entregado', 'Cancelado'];
+      if (estado_pedido && !validEstados.includes(estado_pedido)) {
         return res.status(400).json({
           error: `estado_pedido debe ser uno de: ${validEstados.join(', ')}`
         });
       }
 
-      const result = await query(
-        `UPDATE pedidos SET estado_pedido = $1 WHERE id_pedido = $2 RETURNING *`,
-        [estado_pedido, id_pedido]
-      );
+      // Construcción dinámica de la query
+      const updateFields = [];
+      const params = [];
+      let paramCount = 1;
+
+      if (estado_pedido !== undefined) {
+        updateFields.push(`estado_pedido = $${paramCount++}`);
+        params.push(estado_pedido);
+      }
+      if (estado_pago !== undefined) {
+        updateFields.push(`estado_pago = $${paramCount++}`);
+        params.push(estado_pago);
+      }
+      if (codigo_control !== undefined) {
+        updateFields.push(`codigo_control = $${paramCount++}`);
+        params.push(codigo_control);
+      }
+      if (nit_emisor !== undefined) {
+        updateFields.push(`nit_emisor = $${paramCount++}`);
+        params.push(nit_emisor);
+      }
+      if (numero_factura !== undefined) {
+        updateFields.push(`numero_factura = $${paramCount++}`);
+        params.push(numero_factura);
+      }
+      if (qr_factura !== undefined) {
+        updateFields.push(`qr_factura = $${paramCount++}`);
+        params.push(qr_factura);
+      }
+      if (leyenda_factura !== undefined) {
+        updateFields.push(`leyenda_factura = $${paramCount++}`);
+        params.push(leyenda_factura);
+      }
+
+      if (updateFields.length === 0) {
+        return res.status(400).json({ error: 'No se enviaron campos para actualizar.' });
+      }
+
+      params.push(id_pedido);
+      const queryStr = `UPDATE pedidos SET ${updateFields.join(', ')} WHERE id_pedido = $${paramCount} RETURNING *`;
+
+      const result = await query(queryStr, params);
 
       if (result.rows.length === 0) {
         return res.status(404).json({ error: 'Pedido no encontrado.' });
@@ -97,7 +136,7 @@ export default async function handler(req, res) {
 
       return res.status(200).json({
         success: true,
-        message: `Pedido #${id_pedido} actualizado a "${estado_pedido}".`,
+        message: `Pedido #${id_pedido} actualizado exitosamente.`,
         pedido: result.rows[0]
       });
 
