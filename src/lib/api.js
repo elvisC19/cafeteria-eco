@@ -110,3 +110,19 @@ export const usuariosAPI = {
 export const reportesAPI = {
   ingresos: () => apiFetch('/api/reportes/ingresos'),
 };
+
+// ============ ANALÍTICA — MÓDULO DE INTELIGENCIA ECONÓMICA ============
+export const fetchRentabilidadMenu = async () => {
+  return apiFetch('/api/analitica/rentabilidad');
+};
+
+export const postSimulacionInflacion = async (payload) => {
+  return apiFetch('/api/analitica/simulador', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+};
+
+export const fetchPuntoEquilibrio = async () => {
+  return apiFetch('/api/analitica/equilibrio');
+};
