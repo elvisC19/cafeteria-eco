@@ -1,12 +1,15 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { reportesAPI, productosAPI, insumosAPI, fetchRentabilidadMenu, postSimulacionInflacion, fetchPuntoEquilibrio } from '@/lib/api';
+import { useState, useEffect, Fragment } from 'react';
+import { reportesAPI, productosAPI, insumosAPI, alertasAPI, fetchRentabilidadMenu, postSimulacionInflacion, fetchPuntoEquilibrio } from '@/lib/api';
 
 export default function AdminPage() {
   const [metricas, setMetricas] = useState(null);
   const [productos, setProductos] = useState([]);
-  const [urlEdits, setUrlEdits] = useState({});
-  const [activeTab, setActiveTab] = useState('metrics'); // 'metrics', 'catalog', 'attendance', 'cashflow', 'economic_intelligence'
+  const [editingProducto, setEditingProducto] = useState(null);
+  const [editProductoData, setEditProductoData] = useState({});
+  const [showNuevoProducto, setShowNuevoProducto] = useState(false);
+  const [nuevoProductoData, setNuevoProductoData] = useState({ nombre_producto: '', precio_venta: '', categoria: 'Bebidas Calientes', disponible: true, imagen_url: '' });
+  const [activeTab, setActiveTab] = useState('metrics'); // 'metrics', 'catalog', 'attendance', 'cashflow', 'inventory', 'economic_intelligence'
   const [loading, setLoading] = useState(true);
   const [procesando, setProcesando] = useState(false);
   const [error, setError] = useState('');
@@ -14,10 +17,28 @@ export default function AdminPage() {
 
   // Nuevos estados para asistencia y flujo de caja
   const [asistencias, setAsistencias] = useState([]);
+  const [asistenciaResumen, setAsistenciaResumen] = useState({});
   const [filtroAsistencia, setFiltroAsistencia] = useState('');
+  const [mesAsistencia, setMesAsistencia] = useState(new Date().getMonth() + 1);
+  const [anioAsistencia, setAnioAsistencia] = useState(new Date().getFullYear());
   const [ventas, setVentas] = useState([]);
   const [filtroVentas, setFiltroVentas] = useState('todos'); // 'todos', 'Efectivo', 'Pago QR Simple'
   const [busquedaVenta, setBusquedaVenta] = useState('');
+
+  // Estados para tab de inventario
+  const [inventarioInsumos, setInventarioInsumos] = useState([]);
+  const [inventarioResumen, setInventarioResumen] = useState({});
+  const [editingInsumo, setEditingInsumo] = useState(null);
+  const [editInsumoData, setEditInsumoData] = useState({});
+  const [showNuevoInsumo, setShowNuevoInsumo] = useState(false);
+  const [nuevoInsumoData, setNuevoInsumoData] = useState({ nombre_insumo: '', stock_actual: '', stock_minimo: '', unidad_medida: 'kilos', costo_unitario: '' });
+  const [alertas, setAlertas] = useState([]);
+
+  // Reabastecimiento en Admin con actualización de costos
+  const [reabasteciendoInsumo, setReabasteciendoInsumo] = useState(null);
+  const [cantidadReabastecer, setCantidadReabastecer] = useState('');
+  const [costoUnitarioReabastecer, setCostoUnitarioReabastecer] = useState('');
+  const [costoTotalReabastecer, setCostoTotalReabastecer] = useState('');
 
   // ═══════════════════════════════════════════════════════════════════
   // ESTADOS DEL MÓDULO DE INTELIGENCIA ECONÓMICA
@@ -51,16 +72,24 @@ export default function AdminPage() {
       loadCatalogOnly();
     } else if (activeTab === 'metrics') {
       loadData();
+    } else if (activeTab === 'inventory') {
+      loadInventario();
     } else if (activeTab === 'economic_intelligence') {
       loadEconomicIntelligence();
     }
   }, [activeTab]);
 
+  useEffect(() => {
+    if (activeTab === 'attendance') {
+      loadAttendance();
+    }
+  }, [mesAsistencia, anioAsistencia]);
+
   async function loadData() {
     try {
       const [metricsData, prodData] = await Promise.all([
         reportesAPI.ingresos(),
-        productosAPI.listar(true)
+        productosAPI.listar()
       ]);
       setMetricas(metricsData.metricas);
       setProductos(prodData.productos || []);
@@ -83,7 +112,7 @@ export default function AdminPage() {
 
   async function loadCatalogOnly() {
     try {
-      const prodData = await productosAPI.listar(true);
+      const prodData = await productosAPI.listar();
       setProductos(prodData.productos || []);
     } catch (err) {
       setError(err.message);
@@ -93,10 +122,11 @@ export default function AdminPage() {
   async function loadAttendance() {
     setLoading(true);
     try {
-      const res = await fetch('/api/asistencia');
+      const res = await fetch(`/api/asistencia?mes=${mesAsistencia}&anio=${anioAsistencia}`);
       const data = await res.json();
       if (data.success) {
         setAsistencias(data.asistencias || []);
+        setAsistenciaResumen(data.resumen || {});
       } else {
         throw new Error(data.error || 'No se pudieron cargar los registros de asistencia');
       }
@@ -105,6 +135,190 @@ export default function AdminPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function loadInventario() {
+    setLoading(true);
+    try {
+      const [insData, alertData] = await Promise.all([
+        insumosAPI.listar(),
+        alertasAPI.listar()
+      ]);
+      setInventarioInsumos(insData.insumos || []);
+      setInventarioResumen(insData.resumen || {});
+      setAlertas(alertData.alertas || []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function guardarEdicionInsumo(id_insumo) {
+    setProcesando(true);
+    setError('');
+    try {
+      await insumosAPI.actualizar({ id_insumo, ...editInsumoData });
+      setSuccess('Insumo actualizado exitosamente.');
+      setEditingInsumo(null);
+      setEditInsumoData({});
+      await loadInventario();
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setProcesando(false);
+    }
+  }
+
+  async function crearNuevoInsumo() {
+    if (!nuevoInsumoData.nombre_insumo.trim()) {
+      setError('Ingrese un nombre para el insumo.');
+      return;
+    }
+    setProcesando(true);
+    setError('');
+    try {
+      await insumosAPI.crear(nuevoInsumoData);
+      setSuccess('Insumo creado exitosamente.');
+      setShowNuevoInsumo(false);
+      setNuevoInsumoData({ nombre_insumo: '', stock_actual: '', stock_minimo: '', unidad_medida: 'gramos', costo_unitario: '' });
+      await loadInventario();
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setProcesando(false);
+    }
+  }
+
+  async function eliminarInsumo(insumo) {
+    if (!confirm(`¿Eliminar el insumo "${insumo.nombre_insumo}"? Esta acción no se puede deshacer.`)) return;
+    setProcesando(true);
+    setError('');
+    try {
+      await insumosAPI.eliminar(insumo.id_insumo);
+      setSuccess(`Insumo "${insumo.nombre_insumo}" eliminado.`);
+      await loadInventario();
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setProcesando(false);
+    }
+  }
+
+  const handleAdminCantidadChange = (val, currentCostoUnitario) => {
+    setCantidadReabastecer(val);
+    const qty = parseFloat(val);
+    const unitPrice = parseFloat(costoUnitarioReabastecer) || parseFloat(currentCostoUnitario) || 0;
+    if (!isNaN(qty) && qty > 0) {
+      setCostoTotalReabastecer((qty * unitPrice).toFixed(2));
+      if (!costoUnitarioReabastecer) {
+        setCostoUnitarioReabastecer(unitPrice.toFixed(4));
+      }
+    } else {
+      setCostoTotalReabastecer('');
+    }
+  };
+
+  const handleAdminCostoTotalChange = (val) => {
+    setCostoTotalReabastecer(val);
+    const total = parseFloat(val);
+    const qty = parseFloat(cantidadReabastecer);
+    if (!isNaN(total) && !isNaN(qty) && qty > 0) {
+      setCostoUnitarioReabastecer((total / qty).toFixed(4));
+    } else if (isNaN(total)) {
+      setCostoUnitarioReabastecer('');
+    }
+  };
+
+  const handleAdminCostoUnitarioChange = (val) => {
+    setCostoUnitarioReabastecer(val);
+    const unit = parseFloat(val);
+    const qty = parseFloat(cantidadReabastecer);
+    if (!isNaN(unit) && !isNaN(qty) && qty > 0) {
+      setCostoTotalReabastecer((qty * unit).toFixed(2));
+    } else if (isNaN(unit)) {
+      setCostoTotalReabastecer('');
+    }
+  };
+
+  const resetAdminRestockForm = () => {
+    setReabasteciendoInsumo(null);
+    setCantidadReabastecer('');
+    setCostoTotalReabastecer('');
+    setCostoUnitarioReabastecer('');
+  };
+
+  async function reabastecerInsumoAdmin(id_insumo) {
+    if (!cantidadReabastecer || parseFloat(cantidadReabastecer) <= 0) {
+      setError('Ingrese una cantidad válida.');
+      return;
+    }
+    setProcesando(true);
+    setError('');
+    try {
+      const result = await insumosAPI.reabastecer(
+        id_insumo,
+        parseFloat(cantidadReabastecer),
+        costoUnitarioReabastecer ? parseFloat(costoUnitarioReabastecer) : undefined
+      );
+      setSuccess(result.message);
+      resetAdminRestockForm();
+      await loadInventario();
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setProcesando(false);
+    }
+  }
+
+  async function marcarAlertaLeida(id_alerta) {
+    try {
+      await alertasAPI.marcarLeida(id_alerta);
+      setAlertas(prev => prev.filter(a => a.id_alerta !== id_alerta));
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  async function marcarTodasAlertasLeidas() {
+    try {
+      await alertasAPI.marcarTodasLeidas();
+      setAlertas([]);
+      setSuccess('Todas las alertas marcadas como leídas.');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError(err.message);
+    }
+  }
+
+  function exportarAsistenciaCSV() {
+    const headers = ['Fecha', 'Empleado', 'Rol', 'Hora Entrada', 'Hora Salida', 'Duración (horas)'];
+    const rows = asistenciasFiltradas.map(a => {
+      const duracion = (a.hora_entrada && a.hora_salida)
+        ? ((new Date(a.hora_salida) - new Date(a.hora_entrada)) / (1000 * 60 * 60)).toFixed(2)
+        : 'En turno';
+      return [
+        formatDateOnly(a.fecha),
+        a.nombre,
+        a.rol,
+        formatTimeOnly(a.hora_entrada),
+        a.hora_salida ? formatTimeOnly(a.hora_salida) : '--:--',
+        duracion
+      ];
+    });
+    const csvContent = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    const mesNombre = new Date(anioAsistencia, mesAsistencia - 1).toLocaleString('es-BO', { month: 'long' });
+    link.download = `asistencia_${mesNombre}_${anioAsistencia}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
   }
 
   async function loadVentas() {
@@ -167,17 +381,61 @@ export default function AdminPage() {
     }
   }
 
-  async function guardarImagenUrl(prod) {
-    const newUrl = urlEdits[prod.id_producto];
-    if (newUrl === undefined) return;
-    
+  async function guardarEdicionProducto(id_producto) {
     setProcesando(true);
     setError('');
     try {
-      await productosAPI.actualizarImagenUrl(prod.id_producto, newUrl);
-      setSuccess(`Imagen de '${prod.nombre_producto}' actualizada.`);
-      setTimeout(() => setSuccess(''), 3000);
+      await productosAPI.actualizar({ id_producto, ...editProductoData });
+      setSuccess('Producto actualizado exitosamente.');
+      setEditingProducto(null);
+      setEditProductoData({});
       await loadCatalogOnly();
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setProcesando(false);
+    }
+  }
+
+  async function crearNuevoProducto() {
+    if (!nuevoProductoData.nombre_producto.trim()) {
+      setError('Ingrese un nombre para el producto.');
+      return;
+    }
+    if (!nuevoProductoData.precio_venta || parseFloat(nuevoProductoData.precio_venta) < 0) {
+      setError('Ingrese un precio de venta válido.');
+      return;
+    }
+    if (!nuevoProductoData.categoria.trim()) {
+      setError('Ingrese una categoría.');
+      return;
+    }
+    setProcesando(true);
+    setError('');
+    try {
+      await productosAPI.crear(nuevoProductoData);
+      setSuccess('Producto creado exitosamente.');
+      setShowNuevoProducto(false);
+      setNuevoProductoData({ nombre_producto: '', precio_venta: '', categoria: 'Bebidas Calientes', disponible: true, imagen_url: '' });
+      await loadCatalogOnly();
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setProcesando(false);
+    }
+  }
+
+  async function eliminarProducto(prod) {
+    if (!confirm(`¿Eliminar el producto "${prod.nombre_producto}"? Esta acción no se puede deshacer.`)) return;
+    setProcesando(true);
+    setError('');
+    try {
+      await productosAPI.eliminar(prod.id_producto);
+      setSuccess(`Producto "${prod.nombre_producto}" eliminado.`);
+      await loadCatalogOnly();
+      setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -252,12 +510,12 @@ export default function AdminPage() {
 
   // Filtrado de Ventas
   const ventasFiltradas = ventas.filter(v => {
-    const matchesSearch = 
+    const matchesSearch =
       String(v.id_pedido).includes(busquedaVenta) ||
       (v.cliente_nombre && v.cliente_nombre.toLowerCase().includes(busquedaVenta.toLowerCase())) ||
       (v.razon_social_factura && v.razon_social_factura.toLowerCase().includes(busquedaVenta.toLowerCase())) ||
       (v.nit_factura && String(v.nit_factura).includes(busquedaVenta));
-    
+
     const matchesMethod = filtroVentas === 'todos' || v.metodo_pago === filtroVentas;
     return matchesSearch && matchesMethod;
   });
@@ -267,7 +525,7 @@ export default function AdminPage() {
   const totalEfectivo = ventasFiltradas
     .filter(v => v.estado_pago === 'Pagado' && v.metodo_pago === 'Efectivo')
     .reduce((sum, v) => sum + parseFloat(v.total_pago || 0), 0);
-  
+
   const totalQR = ventasFiltradas
     .filter(v => v.estado_pago === 'Pagado' && v.metodo_pago === 'Pago QR Simple')
     .reduce((sum, v) => sum + parseFloat(v.total_pago || 0), 0);
@@ -334,13 +592,27 @@ export default function AdminPage() {
               onClick={() => setActiveTab('catalog')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${activeTab === 'catalog' ? 'bg-[#3B2B24] text-white' : 'text-[#6B564C] hover:bg-[#F3EAD8]'}`}
             >
-              Img Catálogo
+              Catálogo
             </button>
             <button
               onClick={() => setActiveTab('attendance')}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${activeTab === 'attendance' ? 'bg-[#3B2B24] text-white' : 'text-[#6B564C] hover:bg-[#F3EAD8]'}`}
             >
               Asistencia
+            </button>
+            <button
+              onClick={() => setActiveTab('inventory')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${activeTab === 'inventory' ? 'bg-[#3B2B24] text-white' : 'text-[#6B564C] hover:bg-[#F3EAD8]'}`}
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+              Inventario
+              {alertas.length > 0 && (
+                <span className="w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center animate-pulse">
+                  {alertas.length}
+                </span>
+              )}
             </button>
             <button
               onClick={() => setActiveTab('cashflow')}
@@ -457,7 +729,7 @@ export default function AdminPage() {
                     <div>
                       <span className="text-[9px] text-[var(--color-text-muted)] block uppercase tracking-wider">Promedio Diario</span>
                       <span className="font-bold text-[var(--color-text-secondary)] font-mono">
-                        {formatBOB((metricas?.semanal || []).length > 0 
+                        {formatBOB((metricas?.semanal || []).length > 0
                           ? (metricas.semanal.reduce((acc, d) => acc + parseFloat(d.ingresos || 0), 0) / metricas.semanal.length)
                           : 0
                         )}
@@ -470,7 +742,7 @@ export default function AdminPage() {
                           const semanal = metricas?.semanal || [];
                           if (semanal.length === 0) return '0.00 BOB';
                           const maxObj = semanal.reduce((max, d) => parseFloat(d.ingresos || 0) > parseFloat(max.ingresos || 0) ? d : max, { ingresos: 0, fecha: '' });
-                          return maxObj.fecha 
+                          return maxObj.fecha
                             ? `${parseDateLocally(maxObj.fecha).toLocaleDateString('es-BO', { weekday: 'short', day: 'numeric' })} (${parseFloat(maxObj.ingresos).toFixed(0)} BOB)`
                             : '0 BOB';
                         })()}
@@ -501,7 +773,7 @@ export default function AdminPage() {
                           </span>
                           <div
                             className="w-full bg-gradient-to-t from-[var(--color-cta)] to-[var(--color-gold)] rounded-t-[4px] sm:rounded-t-md transition-all duration-500 ease-out hover:brightness-110 shadow-sm relative cursor-pointer"
-                            style={{ 
+                            style={{
                               height: `${Math.max(percentage, 2)}%`,
                               minHeight: '4px'
                             }}
@@ -588,77 +860,356 @@ export default function AdminPage() {
         {/* ────────────────────────────────────────────────────────────────
             TAB 2: GESTIONAR IMÁGENES DEL CATÁLOGO
             ──────────────────────────────────────────────────────────────── */}
+        {/* ────────────────────────────────────────────────────────────────
+            TAB 2: GESTIÓN COMPLETA DEL CATÁLOGO DE PRODUCTOS (CRUD)
+            ──────────────────────────────────────────────────────────────── */}
         {activeTab === 'catalog' && (
           <div className="space-y-6 animate-fade-in">
-            <div>
-              <h2 className="text-lg font-bold text-[var(--color-text-primary)]" style={{ fontFamily: 'var(--font-playfair)' }}>
-                Gestionar URLs de Imágenes del Menú
-              </h2>
-              <p className="text-xs text-[var(--text-secondary)]">Pegue la URL de la imagen en formato web (Unsplash, etc.) para cada producto del catálogo.</p>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-bold text-[var(--color-text-primary)]" style={{ fontFamily: 'var(--font-playfair)' }}>
+                  Gestión del Catálogo de Productos (Menú)
+                </h2>
+                <p className="text-xs text-[var(--text-secondary)]">Administre los productos del menú, precios de venta, categorías y disponibilidad.</p>
+              </div>
+              <button
+                onClick={() => setShowNuevoProducto(true)}
+                className="bg-[#3B2B24] hover:bg-[#4F3E35] text-white text-xs font-bold py-2 px-4 rounded-xl cursor-pointer transition-colors shadow-sm flex items-center gap-1.5 border-none"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Nuevo Producto
+              </button>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {productos.map(p => (
-                <div key={p.id_producto} className="bg-white border border-[var(--color-border-warm)] rounded-xl p-5 flex gap-4 items-center shadow-sm hover:shadow-md transition-shadow">
-                  {/* Thumb image */}
-                  <div className="w-16 h-16 rounded-lg bg-[var(--color-bg-card)] relative overflow-hidden flex items-center justify-center flex-shrink-0 border border-[var(--color-border-warm)]/40">
-                    {p.imagen_url ? (
-                      <img src={p.imagen_url} alt={p.nombre_producto} className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-lg">☕</span>
-                    )}
-                  </div>
 
-                  {/* Edit Form */}
-                  <div className="flex-1 min-w-0 space-y-1.5">
-                    <h4 className="font-bold text-xs text-[var(--color-text-primary)] truncate">{p.nombre_producto}</h4>
-                    <p className="text-[10px] text-[var(--color-text-muted)] font-semibold uppercase">{p.categoria}</p>
-                    
-                    <div className="flex gap-1.5 items-center">
-                      <input
-                        type="text"
-                        className="input-field !py-1 !px-2 text-[10px] flex-1 bg-neutral-50 focus:bg-white"
-                        placeholder="Pegar URL de Imagen"
-                        value={urlEdits[p.id_producto] !== undefined ? urlEdits[p.id_producto] : (p.imagen_url || '')}
-                        onChange={(e) => setUrlEdits({ ...urlEdits, [p.id_producto]: e.target.value })}
-                      />
-                      <button
-                        onClick={() => guardarImagenUrl(p)}
-                        disabled={procesando}
-                        className="bg-[#3B2B24] hover:bg-[#8A6F57] text-white text-[10px] font-bold py-1 px-2.5 rounded-[4px] cursor-pointer disabled:opacity-50 border-none transition-colors"
-                      >
-                        Guardar
-                      </button>
-                    </div>
+            {/* Formulario de nuevo producto */}
+            {showNuevoProducto && (
+              <div className="bg-white border border-[var(--color-border-warm)] rounded-xl p-5 shadow-sm space-y-4 animate-fade-in">
+                <h3 className="text-sm font-bold text-[var(--color-text-primary)]">Agregar Nuevo Producto</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] mb-1">Nombre</label>
+                    <input
+                      type="text"
+                      value={nuevoProductoData.nombre_producto}
+                      onChange={(e) => setNuevoProductoData({ ...nuevoProductoData, nombre_producto: e.target.value })}
+                      className="input-field text-xs !py-2"
+                      placeholder="Ej: Latte de Canela"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] mb-1">Precio Venta (BOB)</label>
+                    <input
+                      type="number"
+                      step="0.10"
+                      value={nuevoProductoData.precio_venta}
+                      onChange={(e) => setNuevoProductoData({ ...nuevoProductoData, precio_venta: e.target.value })}
+                      className="input-field text-xs !py-2"
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] mb-1">Categoría</label>
+                    <select
+                      value={nuevoProductoData.categoria}
+                      onChange={(e) => setNuevoProductoData({ ...nuevoProductoData, categoria: e.target.value })}
+                      className="input-field text-xs !py-2 bg-white cursor-pointer"
+                    >
+                      <option value="Bebidas Calientes">Bebidas Calientes</option>
+                      <option value="Bebidas Frías">Bebidas Frías</option>
+                      <option value="Repostería">Repostería</option>
+                      <option value="Comida">Comida</option>
+                      <option value="Otros">Otros</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] mb-1">Estado</label>
+                    <select
+                      value={nuevoProductoData.disponible}
+                      onChange={(e) => setNuevoProductoData({ ...nuevoProductoData, disponible: e.target.value === 'true' })}
+                      className="input-field text-xs !py-2 bg-white cursor-pointer"
+                    >
+                      <option value="true">Disponible</option>
+                      <option value="false">No Disponible</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] mb-1">URL de Imagen</label>
+                    <input
+                      type="text"
+                      value={nuevoProductoData.imagen_url}
+                      onChange={(e) => setNuevoProductoData({ ...nuevoProductoData, imagen_url: e.target.value })}
+                      className="input-field text-xs !py-2"
+                      placeholder="URL de imagen web (opcional)"
+                    />
                   </div>
                 </div>
-              ))}
+                <div className="flex gap-2">
+                  <button
+                    onClick={crearNuevoProducto}
+                    disabled={procesando}
+                    className="bg-[#3B2B24] hover:bg-[#4F3E35] text-white text-xs font-bold py-2 px-4 rounded-lg cursor-pointer transition-colors border-none disabled:opacity-50"
+                  >
+                    Guardar Producto
+                  </button>
+                  <button
+                    onClick={() => { setShowNuevoProducto(false); setNuevoProductoData({ nombre_producto: '', precio_venta: '', categoria: 'Bebidas Calientes', disponible: true, imagen_url: '' }); }}
+                    className="bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-bold py-2 px-4 rounded-lg cursor-pointer transition-colors border-none"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Tabla de Productos */}
+            <div className="bg-white border border-[var(--color-border-warm)] rounded-xl overflow-hidden shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse text-left">
+                  <thead>
+                    <tr className="bg-neutral-50 border-b border-[var(--color-border-warm)] text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">
+                      <th className="py-3 px-4">Imagen</th>
+                      <th className="py-3 px-4">Producto</th>
+                      <th className="py-3 px-4">Categoría</th>
+                      <th className="py-3 px-4 text-right">Precio de Venta</th>
+                      <th className="py-3 px-4 text-center">Estado</th>
+                      <th className="py-3 px-4 text-center">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-neutral-100 text-xs">
+                    {productos.map((p) => {
+                      const isEditing = editingProducto === p.id_producto;
+                      return (
+                        <Fragment key={p.id_producto}>
+                          <tr className="hover:bg-neutral-50/50">
+                            <td className="py-2.5 px-4">
+                              <div className="w-10 h-10 rounded-lg bg-[var(--color-bg-card)] relative overflow-hidden flex items-center justify-center flex-shrink-0 border border-neutral-200">
+                                {p.imagen_url ? (
+                                  <img src={p.imagen_url} alt={p.nombre_producto} className="w-full h-full object-cover" />
+                                ) : (
+                                  <span className="text-base">☕</span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="py-2.5 px-4 font-bold text-[var(--color-text-primary)]">{p.nombre_producto}</td>
+                            <td className="py-2.5 px-4 text-[var(--color-text-muted)]">{p.categoria}</td>
+                            <td className="py-2.5 px-4 text-right font-mono font-bold text-[var(--color-text-primary)]">
+                              Bs. {parseFloat(p.precio_venta).toFixed(2)}
+                            </td>
+                            <td className="py-2.5 px-4 text-center">
+                              <span className={`inline-block text-[9px] font-bold px-2 py-0.5 rounded-full ${p.disponible ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
+                                {p.disponible ? 'Disponible' : 'No Disponible'}
+                              </span>
+                            </td>
+                            <td className="py-2.5 px-4 text-center">
+                              <div className="flex items-center justify-center gap-1">
+                                {isEditing ? (
+                                  <span className="text-[10px] text-neutral-400 font-bold bg-neutral-50 px-2 py-1 rounded">Editando...</span>
+                                ) : (
+                                  <>
+                                    <button
+                                      onClick={() => {
+                                        setEditingProducto(p.id_producto);
+                                        setEditProductoData({
+                                          nombre_producto: p.nombre_producto,
+                                          precio_venta: p.precio_venta,
+                                          categoria: p.categoria,
+                                          disponible: p.disponible,
+                                          imagen_url: p.imagen_url || ''
+                                        });
+                                      }}
+                                      className="text-[10px] font-bold text-blue-600 hover:text-blue-800 cursor-pointer border-none bg-blue-50 px-2 py-1 rounded"
+                                    >
+                                      Editar
+                                    </button>
+                                    <button
+                                      onClick={() => eliminarProducto(p)}
+                                      disabled={procesando}
+                                      className="text-[10px] font-bold text-red-500 hover:text-red-700 cursor-pointer border-none bg-red-50 px-2 py-1 rounded disabled:opacity-50"
+                                    >
+                                      Eliminar
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                          {isEditing && (
+                            <tr className="bg-blue-50/10">
+                              <td colSpan="6" className="py-3 px-4 border-b border-[var(--color-border-warm)]">
+                                <div className="space-y-3">
+                                  <p className="text-[10px] font-bold text-[#3B2B24] uppercase">Editar Producto: {p.nombre_producto}</p>
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
+                                    <div>
+                                      <label className="block text-[9px] font-bold text-neutral-500 uppercase mb-1">Nombre</label>
+                                      <input
+                                        type="text"
+                                        className="input-field text-xs !py-1.5 !px-2"
+                                        value={editProductoData.nombre_producto ?? ''}
+                                        onChange={(e) => setEditProductoData({ ...editProductoData, nombre_producto: e.target.value })}
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-[9px] font-bold text-neutral-500 uppercase mb-1">Precio Venta (BOB)</label>
+                                      <input
+                                        type="number"
+                                        step="0.10"
+                                        className="input-field text-xs !py-1.5 !px-2 font-mono"
+                                        value={editProductoData.precio_venta ?? ''}
+                                        onChange={(e) => setEditProductoData({ ...editProductoData, precio_venta: e.target.value })}
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="block text-[9px] font-bold text-neutral-500 uppercase mb-1">Categoría</label>
+                                      <select
+                                        className="input-field text-xs !py-1.5 !px-2 bg-white cursor-pointer"
+                                        value={editProductoData.categoria ?? ''}
+                                        onChange={(e) => setEditProductoData({ ...editProductoData, categoria: e.target.value })}
+                                      >
+                                        <option value="Bebidas Calientes">Bebidas Calientes</option>
+                                        <option value="Bebidas Frías">Bebidas Frías</option>
+                                        <option value="Repostería">Repostería</option>
+                                        <option value="Comida">Comida</option>
+                                        <option value="Otros">Otros</option>
+                                      </select>
+                                    </div>
+                                    <div>
+                                      <label className="block text-[9px] font-bold text-neutral-500 uppercase mb-1">Disponibilidad</label>
+                                      <select
+                                        className="input-field text-xs !py-1.5 !px-2 bg-white cursor-pointer"
+                                        value={editProductoData.disponible === true || editProductoData.disponible === 'true' ? 'true' : 'false'}
+                                        onChange={(e) => setEditProductoData({ ...editProductoData, disponible: e.target.value === 'true' })}
+                                      >
+                                        <option value="true">Disponible</option>
+                                        <option value="false">No Disponible</option>
+                                      </select>
+                                    </div>
+                                    <div>
+                                      <label className="block text-[9px] font-bold text-neutral-500 uppercase mb-1">URL Imagen</label>
+                                      <input
+                                        type="text"
+                                        className="input-field text-xs !py-1.5 !px-2"
+                                        placeholder="Pegar URL de Imagen"
+                                        value={editProductoData.imagen_url ?? ''}
+                                        onChange={(e) => setEditProductoData({ ...editProductoData, imagen_url: e.target.value })}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="flex gap-2 justify-end">
+                                    <button
+                                      onClick={() => { setEditingProducto(null); setEditProductoData({}); }}
+                                      className="bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-[10px] font-bold py-1.5 px-3 rounded-lg border-none cursor-pointer"
+                                    >
+                                      Cancelar
+                                    </button>
+                                    <button
+                                      onClick={() => guardarEdicionProducto(p.id_producto)}
+                                      disabled={procesando}
+                                      className="bg-[#3B2B24] hover:bg-[#4F3E35] text-white text-[10px] font-bold py-1.5 px-3 rounded-lg border-none cursor-pointer disabled:opacity-50"
+                                    >
+                                      Guardar Cambios
+                                    </button>
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </Fragment>
+                      );
+                    })}
+                    {productos.length === 0 && (
+                      <tr>
+                        <td colSpan="6" className="py-8 text-center text-sm text-[var(--color-text-muted)]">
+                          No hay productos registrados en el menú.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         )}
 
         {/* ────────────────────────────────────────────────────────────────
-            TAB 3: REGISTRO DE ASISTENCIA
+            TAB 3: REGISTRO DE ASISTENCIA (MENSUAL CON EXPORTACIÓN)
             ──────────────────────────────────────────────────────────────── */}
         {activeTab === 'attendance' && (
           <div className="space-y-6 animate-fade-in">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
               <div>
                 <h2 className="text-lg font-bold text-[var(--color-text-primary)]" style={{ fontFamily: 'var(--font-playfair)' }}>
                   Registro de Asistencia del Personal
                 </h2>
-                <p className="text-xs text-[var(--text-secondary)]">Monitoreo de horas de entrada y salida marcadas por los trabajadores.</p>
+                <p className="text-xs text-[var(--text-secondary)]">Monitoreo mensual de horas de entrada, salida y duración de turnos.</p>
               </div>
 
-              {/* Filtro de búsqueda */}
-              <div className="w-full sm:w-64">
+              <div className="flex flex-wrap items-center gap-2">
+                {/* Selector de Mes */}
+                <select
+                  value={mesAsistencia}
+                  onChange={(e) => setMesAsistencia(parseInt(e.target.value))}
+                  className="input-field text-xs !py-2 bg-white cursor-pointer !w-auto"
+                >
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(m => (
+                    <option key={m} value={m}>
+                      {new Date(2024, m - 1).toLocaleString('es-BO', { month: 'long' }).charAt(0).toUpperCase() + new Date(2024, m - 1).toLocaleString('es-BO', { month: 'long' }).slice(1)}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Selector de Año */}
+                <select
+                  value={anioAsistencia}
+                  onChange={(e) => setAnioAsistencia(parseInt(e.target.value))}
+                  className="input-field text-xs !py-2 bg-white cursor-pointer !w-auto"
+                >
+                  {[2024, 2025, 2026, 2027].map(a => (
+                    <option key={a} value={a}>{a}</option>
+                  ))}
+                </select>
+
+                {/* Búsqueda */}
                 <input
                   type="text"
                   placeholder="Buscar empleado o rol..."
                   value={filtroAsistencia}
                   onChange={(e) => setFiltroAsistencia(e.target.value)}
-                  className="input-field text-xs !py-2"
+                  className="input-field text-xs !py-2 !w-48"
                 />
+
+                {/* Exportar CSV */}
+                <button
+                  onClick={exportarAsistenciaCSV}
+                  disabled={asistenciasFiltradas.length === 0}
+                  className="bg-[#3B2B24] hover:bg-[#4F3E35] text-white text-xs font-bold py-2 px-4 rounded-xl cursor-pointer transition-colors shadow-sm flex items-center gap-1.5 border-none disabled:opacity-50"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Exportar CSV
+                </button>
+              </div>
+            </div>
+
+            {/* Resumen mensual */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="bg-white border border-[var(--color-border-warm)] p-4 rounded-xl shadow-sm">
+                <p className="text-2xl font-bold text-[#3B2B24]">{asistenciaResumen.total_registros || 0}</p>
+                <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider mt-1">Registros Totales</p>
+              </div>
+              <div className="bg-white border border-[var(--color-border-warm)] p-4 rounded-xl shadow-sm border-l-4 border-l-emerald-500">
+                <p className="text-2xl font-bold text-emerald-700">{asistenciaResumen.turnos_completos || 0}</p>
+                <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider mt-1">Turnos Completados</p>
+              </div>
+              <div className="bg-white border border-[var(--color-border-warm)] p-4 rounded-xl shadow-sm border-l-4 border-l-amber-500">
+                <p className="text-2xl font-bold text-amber-700">{asistenciaResumen.horas_totales || 0}h</p>
+                <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider mt-1">Horas Trabajadas</p>
+              </div>
+              <div className="bg-white border border-[var(--color-border-warm)] p-4 rounded-xl shadow-sm border-l-4 border-l-blue-500">
+                <p className="text-2xl font-bold text-blue-700">{asistenciaResumen.turnos_activos || 0}</p>
+                <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider mt-1">Turnos Activos</p>
               </div>
             </div>
 
@@ -673,12 +1224,20 @@ export default function AdminPage() {
                       <th className="py-3 px-4">Rol</th>
                       <th className="py-3 px-4">Entrada</th>
                       <th className="py-3 px-4">Salida</th>
+                      <th className="py-3 px-4 text-center">Duración</th>
                       <th className="py-3 px-4 text-center">Estado</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-neutral-100 text-xs">
                     {asistenciasFiltradas.map((a) => {
                       const finalizado = !!a.hora_salida;
+                      let duracion = '';
+                      if (a.hora_entrada && a.hora_salida) {
+                        const diff = (new Date(a.hora_salida) - new Date(a.hora_entrada)) / (1000 * 60);
+                        const horas = Math.floor(diff / 60);
+                        const minutos = Math.round(diff % 60);
+                        duracion = `${horas}h ${minutos}m`;
+                      }
                       return (
                         <tr key={a.id_asistencia} className="hover:bg-neutral-50/50">
                           <td className="py-3.5 px-4 font-medium">{formatDateOnly(a.fecha)}</td>
@@ -690,6 +1249,9 @@ export default function AdminPage() {
                           <td className="py-3.5 px-4 font-mono font-semibold text-rose-600">
                             {finalizado ? formatTimeOnly(a.hora_salida) : '--:--'}
                           </td>
+                          <td className="py-3.5 px-4 text-center font-mono font-semibold text-[var(--color-text-primary)]">
+                            {finalizado ? duracion : '—'}
+                          </td>
                           <td className="py-3.5 px-4 text-center">
                             <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-full ${finalizado ? 'bg-neutral-100 text-neutral-600' : 'bg-emerald-50 text-emerald-700 animate-pulse'}`}>
                               {finalizado ? 'Turno Terminado' : 'En Turno'}
@@ -700,8 +1262,377 @@ export default function AdminPage() {
                     })}
                     {asistenciasFiltradas.length === 0 && (
                       <tr>
-                        <td colSpan="6" className="py-8 text-center text-sm text-[var(--color-text-muted)]">
-                          No se encontraron registros de asistencia.
+                        <td colSpan="7" className="py-8 text-center text-sm text-[var(--color-text-muted)]">
+                          No se encontraron registros de asistencia para {new Date(anioAsistencia, mesAsistencia - 1).toLocaleString('es-BO', { month: 'long', year: 'numeric' })}.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ────────────────────────────────────────────────────────────────
+            TAB 3.5: GESTIÓN DE INVENTARIO Y PRECIOS
+            ──────────────────────────────────────────────────────────────── */}
+        {activeTab === 'inventory' && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-bold text-[var(--color-text-primary)]" style={{ fontFamily: 'var(--font-playfair)' }}>
+                  Gestión de Inventario y Precios
+                </h2>
+                <p className="text-xs text-[var(--text-secondary)]">Administre insumos, precios unitarios y alertas de stock bajo.</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowNuevoInsumo(true)}
+                  className="bg-[#3B2B24] hover:bg-[#4F3E35] text-white text-xs font-bold py-2 px-4 rounded-xl cursor-pointer transition-colors shadow-sm flex items-center gap-1.5 border-none"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Nuevo Insumo
+                </button>
+                <button
+                  onClick={loadInventario}
+                  className="bg-white border border-[var(--color-border-warm)] text-[#3B2B24] text-xs font-bold py-2 px-4 rounded-xl cursor-pointer transition-colors hover:bg-neutral-50 flex items-center gap-1.5"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Actualizar
+                </button>
+              </div>
+            </div>
+
+            {/* Alertas de inventario */}
+            {alertas.length > 0 && (
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-bold text-red-800 flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    Alertas de Stock ({alertas.length}) — Requiere validación física en almacén
+                  </h3>
+                  <button
+                    onClick={marcarTodasAlertasLeidas}
+                    className="text-[10px] font-bold text-red-600 hover:text-red-800 cursor-pointer border-none bg-transparent underline"
+                  >
+                    Marcar todas como leídas
+                  </button>
+                </div>
+                {alertas.map(alerta => (
+                  <div key={alerta.id_alerta} className="flex items-center justify-between bg-white rounded-lg p-3 border border-red-100">
+                    <div className="flex items-center gap-3">
+                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${alerta.tipo === 'AGOTADO' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'}`}>
+                        {alerta.tipo}
+                      </span>
+                      <div>
+                        <p className="text-xs font-bold text-[var(--color-text-primary)]">{alerta.nombre_insumo}</p>
+                        <p className="text-[10px] text-[var(--color-text-muted)]">
+                          Stock: {parseFloat(alerta.stock_actual).toFixed(2)} {alerta.unidad_medida} (mín: {parseFloat(alerta.stock_minimo).toFixed(2)})
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => marcarAlertaLeida(alerta.id_alerta)}
+                      className="text-[10px] text-neutral-400 hover:text-neutral-600 cursor-pointer border-none bg-transparent"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Formulario de nuevo insumo */}
+            {showNuevoInsumo && (
+              <div className="bg-white border border-[var(--color-border-warm)] rounded-xl p-5 shadow-sm space-y-4 animate-fade-in">
+                <h3 className="text-sm font-bold text-[var(--color-text-primary)]">Agregar Nuevo Insumo</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] mb-1">Nombre</label>
+                    <input
+                      type="text"
+                      value={nuevoInsumoData.nombre_insumo}
+                      onChange={(e) => setNuevoInsumoData({ ...nuevoInsumoData, nombre_insumo: e.target.value })}
+                      className="input-field text-xs !py-2"
+                      placeholder="Ej: Café molido"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] mb-1">Stock Inicial</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={nuevoInsumoData.stock_actual}
+                      onChange={(e) => setNuevoInsumoData({ ...nuevoInsumoData, stock_actual: e.target.value })}
+                      className="input-field text-xs !py-2"
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] mb-1">Stock Mínimo</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={nuevoInsumoData.stock_minimo}
+                      onChange={(e) => setNuevoInsumoData({ ...nuevoInsumoData, stock_minimo: e.target.value })}
+                      className="input-field text-xs !py-2"
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] mb-1">Unidad</label>
+                    <select
+                      value={nuevoInsumoData.unidad_medida}
+                      onChange={(e) => setNuevoInsumoData({ ...nuevoInsumoData, unidad_medida: e.target.value })}
+                      className="input-field text-xs !py-2 bg-white cursor-pointer"
+                    >
+                      <option value="kilos">kilos</option>
+                      <option value="litros">litros</option>
+                      <option value="unidades">unidades</option>
+                      <option value="piezas">piezas</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)] mb-1">Precio Unit. (BOB)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={nuevoInsumoData.costo_unitario}
+                      onChange={(e) => setNuevoInsumoData({ ...nuevoInsumoData, costo_unitario: e.target.value })}
+                      className="input-field text-xs !py-2"
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={crearNuevoInsumo}
+                    disabled={procesando}
+                    className="bg-[#3B2B24] hover:bg-[#4F3E35] text-white text-xs font-bold py-2 px-4 rounded-lg cursor-pointer transition-colors border-none disabled:opacity-50"
+                  >
+                    Guardar Insumo
+                  </button>
+                  <button
+                    onClick={() => { setShowNuevoInsumo(false); setNuevoInsumoData({ nombre_insumo: '', stock_actual: '', stock_minimo: '', unidad_medida: 'gramos', costo_unitario: '' }); }}
+                    className="bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-bold py-2 px-4 rounded-lg cursor-pointer transition-colors border-none"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Resumen de inventario */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="bg-white border border-[var(--color-border-warm)] p-4 rounded-xl shadow-sm">
+                <p className="text-2xl font-bold text-[#3B2B24]">{inventarioResumen.total || 0}</p>
+                <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider mt-1">Total Insumos</p>
+              </div>
+              <div className="bg-white border border-[var(--color-border-warm)] p-4 rounded-xl shadow-sm border-l-4 border-l-emerald-500">
+                <p className="text-2xl font-bold text-emerald-700">{inventarioResumen.normales || 0}</p>
+                <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider mt-1">Stock Normal</p>
+              </div>
+              <div className={`bg-white border border-[var(--color-border-warm)] p-4 rounded-xl shadow-sm border-l-4 border-l-red-500 ${(inventarioResumen.criticos || 0) > 0 ? 'animate-pulse' : ''}`}>
+                <p className="text-2xl font-bold text-red-700">{inventarioResumen.criticos || 0}</p>
+                <p className="text-[10px] font-bold text-[var(--color-text-muted)] uppercase tracking-wider mt-1">Stock Crítico</p>
+              </div>
+            </div>
+
+            {/* Tabla de insumos */}
+            <div className="bg-white border border-[var(--color-border-warm)] rounded-xl overflow-hidden shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse text-left">
+                  <thead>
+                    <tr className="bg-neutral-50 border-b border-[var(--color-border-warm)] text-[10px] font-bold uppercase tracking-wider text-[var(--color-text-muted)]">
+                      <th className="py-3 px-4">Insumo</th>
+                      <th className="py-3 px-4">Unidad</th>
+                      <th className="py-3 px-4 text-right">Stock Actual</th>
+                      <th className="py-3 px-4 text-right">Stock Mín.</th>
+                      <th className="py-3 px-4 text-right">Precio Unit. (BOB)</th>
+                      <th className="py-3 px-4 text-center">Nivel</th>
+                      <th className="py-3 px-4 text-center">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-neutral-100 text-xs">
+                    {inventarioInsumos.map((ins) => {
+                      const isCritico = parseFloat(ins.stock_actual) <= parseFloat(ins.stock_minimo);
+                      const isEditing = editingInsumo === ins.id_insumo;
+                      const isReabasteciendo = reabasteciendoInsumo === ins.id_insumo;
+
+                      return (
+                        <Fragment key={ins.id_insumo}>
+                          <tr className={`hover:bg-neutral-50/50 ${isCritico ? 'bg-red-50/30' : ''}`}>
+                            <td className="py-3.5 px-4 font-bold text-[var(--color-text-primary)]">{ins.nombre_insumo}</td>
+                            <td className="py-3.5 px-4 text-[var(--color-text-muted)]">{ins.unidad_medida}</td>
+                            <td className={`py-3.5 px-4 text-right font-mono font-semibold ${isCritico ? 'text-red-600' : 'text-[var(--color-text-primary)]'}`}>
+                              {parseFloat(ins.stock_actual).toFixed(2)}
+                            </td>
+                            <td className="py-3.5 px-4 text-right font-mono">
+                              {isEditing ? (
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  defaultValue={parseFloat(ins.stock_minimo).toFixed(2)}
+                                  onChange={(e) => setEditInsumoData(prev => ({ ...prev, stock_minimo: e.target.value }))}
+                                  className="input-field text-xs !py-1 !px-2 !w-20 text-right"
+                                />
+                              ) : (
+                                parseFloat(ins.stock_minimo).toFixed(2)
+                              )}
+                            </td>
+                            <td className="py-3.5 px-4 text-right font-mono font-bold" style={{ color: '#B8860B' }}>
+                              {isEditing ? (
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  defaultValue={parseFloat(ins.costo_unitario || 0).toFixed(2)}
+                                  onChange={(e) => setEditInsumoData(prev => ({ ...prev, costo_unitario: e.target.value }))}
+                                  className="input-field text-xs !py-1 !px-2 !w-24 text-right"
+                                />
+                              ) : (
+                                parseFloat(ins.costo_unitario || 0).toFixed(2)
+                              )}
+                            </td>
+                            <td className="py-3.5 px-4 text-center">
+                              <span className={`inline-block text-[9px] font-bold px-2 py-0.5 rounded-full ${ins.nivel_stock === 'AGOTADO' ? 'bg-red-100 text-red-800 animate-pulse' :
+                                  ins.nivel_stock === 'CRITICO' ? 'bg-red-100 text-red-700' :
+                                    ins.nivel_stock === 'BAJO' ? 'bg-amber-100 text-amber-700' :
+                                      'bg-emerald-50 text-emerald-700'
+                                }`}>
+                                {ins.nivel_stock}
+                              </span>
+                            </td>
+                            <td className="py-3.5 px-4 text-center">
+                              <div className="flex items-center justify-center gap-1">
+                                {isEditing ? (
+                                  <>
+                                    <button
+                                      onClick={() => guardarEdicionInsumo(ins.id_insumo)}
+                                      disabled={procesando}
+                                      className="text-[10px] font-bold text-emerald-600 hover:text-emerald-800 cursor-pointer border-none bg-emerald-50 px-2 py-1 rounded disabled:opacity-50"
+                                    >
+                                      Guardar
+                                    </button>
+                                    <button
+                                      onClick={() => { setEditingInsumo(null); setEditInsumoData({}); }}
+                                      className="text-[10px] font-bold text-neutral-500 hover:text-neutral-700 cursor-pointer border-none bg-neutral-100 px-2 py-1 rounded"
+                                    >
+                                      ✕
+                                    </button>
+                                  </>
+                                ) : isReabasteciendo ? (
+                                  <span className="text-[10px] text-amber-600 font-bold bg-amber-50 px-2 py-1 rounded animate-pulse">Abasteciendo...</span>
+                                ) : (
+                                  <>
+                                    <button
+                                      onClick={() => {
+                                        setReabasteciendoInsumo(ins.id_insumo);
+                                        setCantidadReabastecer('');
+                                        setCostoUnitarioReabastecer(parseFloat(ins.costo_unitario || 0).toFixed(4));
+                                        setCostoTotalReabastecer('');
+                                        setEditingInsumo(null);
+                                      }}
+                                      className="text-[10px] font-bold text-amber-700 hover:text-amber-900 cursor-pointer border-none bg-amber-50 px-2 py-1 rounded"
+                                      title="Reabastecer stock y registrar costo"
+                                    >
+                                      Reabastecer
+                                    </button>
+                                    <button
+                                      onClick={() => { setEditingInsumo(ins.id_insumo); setEditInsumoData({}); setReabasteciendoInsumo(null); }}
+                                      className="text-[10px] font-bold text-blue-600 hover:text-blue-800 cursor-pointer border-none bg-blue-50 px-2 py-1 rounded"
+                                      title="Editar precio y stock mínimo"
+                                    >
+                                      Editar
+                                    </button>
+                                    <button
+                                      onClick={() => eliminarInsumo(ins)}
+                                      disabled={procesando}
+                                      className="text-[10px] font-bold text-red-500 hover:text-red-700 cursor-pointer border-none bg-red-50 px-2 py-1 rounded disabled:opacity-50"
+                                      title="Eliminar insumo"
+                                    >
+                                      Eliminar
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                          {isReabasteciendo && (
+                            <tr className="bg-amber-50/20">
+                              <td colSpan="7" className="py-3 px-4 border-b border-[var(--color-border-warm)]">
+                                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
+                                  <div className="flex-1 max-w-2xl">
+                                    <p className="text-[10px] font-bold text-[#3B2B24] uppercase mb-1">Registrar Ingreso de Stock: {ins.nombre_insumo}</p>
+                                    <div className="grid grid-cols-3 gap-3">
+                                      <div>
+                                        <label className="block text-[9px] font-bold text-neutral-500 uppercase mb-1">Cantidad a agregar</label>
+                                        <input
+                                          type="number"
+                                          step="0.01"
+                                          className="input-field text-xs !py-1 !px-2"
+                                          placeholder={`En ${ins.unidad_medida}`}
+                                          value={cantidadReabastecer}
+                                          onChange={(e) => handleAdminCantidadChange(e.target.value, ins.costo_unitario)}
+                                          autoFocus
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="block text-[9px] font-bold text-neutral-500 uppercase mb-1">Costo Total (BOB)</label>
+                                        <input
+                                          type="number"
+                                          step="0.01"
+                                          className="input-field text-xs !py-1 !px-2"
+                                          placeholder="0.00"
+                                          value={costoTotalReabastecer}
+                                          onChange={(e) => handleAdminCostoTotalChange(e.target.value)}
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="block text-[9px] font-bold text-neutral-500 uppercase mb-1">Costo Unit. (BOB)</label>
+                                        <input
+                                          type="number"
+                                          step="0.0001"
+                                          className="input-field text-xs !py-1 !px-2 font-mono"
+                                          placeholder="0.00"
+                                          value={costoUnitarioReabastecer}
+                                          onChange={(e) => handleAdminCostoUnitarioChange(e.target.value)}
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <div className="flex gap-2 pb-0.5">
+                                    <button
+                                      onClick={resetAdminRestockForm}
+                                      className="bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-[10px] font-bold py-1.5 px-3 rounded-lg border-none cursor-pointer"
+                                    >
+                                      Cancelar
+                                    </button>
+                                    <button
+                                      onClick={() => reabastecerInsumoAdmin(ins.id_insumo)}
+                                      disabled={procesando}
+                                      className="bg-[#3B2B24] hover:bg-[#4F3E35] text-white text-[10px] font-bold py-1.5 px-3 rounded-lg border-none cursor-pointer disabled:opacity-50"
+                                    >
+                                      Confirmar Reabastecimiento
+                                    </button>
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </Fragment>
+                      );
+                    })}
+                    {inventarioInsumos.length === 0 && (
+                      <tr>
+                        <td colSpan="7" className="py-8 text-center text-sm text-[var(--color-text-muted)]">
+                          No hay insumos registrados.
                         </td>
                       </tr>
                     )}
@@ -884,7 +1815,7 @@ export default function AdminPage() {
                 ────────────────────────────────────────────── */}
             {rentabilidadLoading ? (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {[1,2,3].map(i => (
+                {[1, 2, 3].map(i => (
                   <div key={i} className="bg-white border border-[var(--color-border-warm)] rounded-xl p-6 animate-pulse">
                     <div className="h-3 bg-[#F3EAD8] rounded w-2/3 mb-3"></div>
                     <div className="h-7 bg-[#F3EAD8] rounded w-1/2 mb-2"></div>
@@ -897,7 +1828,7 @@ export default function AdminPage() {
                 {/* KPI 1: Producto Líder */}
                 <div className="bg-white border border-[var(--color-border-warm)] rounded-xl p-5 shadow-sm relative overflow-hidden transition-all hover:shadow-md hover:-translate-y-0.5">
                   <div className="absolute top-0 right-0 w-20 h-20 opacity-[0.06]">
-                    <svg viewBox="0 0 24 24" fill="#1B5E20"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    <svg viewBox="0 0 24 24" fill="#1B5E20"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
                   </div>
                   <p className="text-[10px] font-bold uppercase tracking-wider text-[#6B3020] mb-2">
                     🏆 Producto Líder en Margen
@@ -916,7 +1847,7 @@ export default function AdminPage() {
                 {/* KPI 2: Producto Crítico */}
                 <div className="bg-white border border-[var(--color-border-warm)] rounded-xl p-5 shadow-sm relative overflow-hidden transition-all hover:shadow-md hover:-translate-y-0.5">
                   <div className="absolute top-0 right-0 w-20 h-20 opacity-[0.06]">
-                    <svg viewBox="0 0 24 24" fill="#B71C1C"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+                    <svg viewBox="0 0 24 24" fill="#B71C1C"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" /></svg>
                   </div>
                   <p className="text-[10px] font-bold uppercase tracking-wider text-[#6B3020] mb-2">
                     ⚠️ Producto Crítico
@@ -935,7 +1866,7 @@ export default function AdminPage() {
                 {/* KPI 3: Margen Promedio */}
                 <div className="bg-white border border-[var(--color-border-warm)] rounded-xl p-5 shadow-sm relative overflow-hidden transition-all hover:shadow-md hover:-translate-y-0.5">
                   <div className="absolute top-0 right-0 w-20 h-20 opacity-[0.06]">
-                    <svg viewBox="0 0 24 24" fill="#B8860B"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+                    <svg viewBox="0 0 24 24" fill="#B8860B"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" /></svg>
                   </div>
                   <p className="text-[10px] font-bold uppercase tracking-wider text-[#6B3020] mb-2">
                     📊 Margen Promedio del Negocio
@@ -971,7 +1902,7 @@ export default function AdminPage() {
 
                 {rentabilidadLoading ? (
                   <div className="p-6 space-y-3">
-                    {[1,2,3,4,5].map(i => (
+                    {[1, 2, 3, 4, 5].map(i => (
                       <div key={i} className="flex gap-4 animate-pulse">
                         <div className="h-4 bg-[#F3EAD8] rounded w-1/4"></div>
                         <div className="h-4 bg-[#F3EAD8] rounded w-1/6"></div>
@@ -1406,7 +2337,7 @@ export default function AdminPage() {
                 <td style={{ padding: '4px 5px' }}>#{v.id_pedido}</td>
                 <td style={{ padding: '4px 5px' }}>{formatDateTime(v.fecha_hora)}</td>
                 <td style={{ padding: '4px 5px' }}>
-                  {v.razon_social_factura || v.cliente_nombre || 'Local / Mostrador'} 
+                  {v.razon_social_factura || v.cliente_nombre || 'Local / Mostrador'}
                   {v.nit_factura && v.nit_factura !== '0' ? ` (NIT: ${v.nit_factura})` : ''}
                 </td>
                 <td style={{ padding: '4px 5px' }}>{v.metodo_pago || 'No especificado'}</td>
@@ -1427,7 +2358,8 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @media print {
           body, html, main, aside, header, nav, .no-print {
             display: none !important;
