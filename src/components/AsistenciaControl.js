@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 
 export default function AsistenciaControl({ usuario }) {
   const [registro, setRegistro] = useState(null);
+  const [turnoAnterior, setTurnoAnterior] = useState(null);
   const [loading, setLoading] = useState(true);
   const [procesando, setProcesando] = useState(false);
   const [error, setError] = useState('');
@@ -20,6 +21,7 @@ export default function AsistenciaControl({ usuario }) {
       const data = await res.json();
       if (data.success) {
         setRegistro(data.registro);
+        setTurnoAnterior(data.turno_anterior || null);
       }
     } catch (err) {
       console.error('Error al obtener estado de asistencia:', err);
@@ -47,6 +49,7 @@ export default function AsistenciaControl({ usuario }) {
       }
       setSuccess(data.message);
       setRegistro(data.registro);
+      setTurnoAnterior(null);
       setTimeout(() => setSuccess(''), 4000);
     } catch (err) {
       setError(err.message);
@@ -71,15 +74,17 @@ export default function AsistenciaControl({ usuario }) {
 
   const hasEntrada = !!registro?.hora_entrada;
   const hasSalida = !!registro?.hora_salida;
+  // Si no hay registro activo pero hay turno anterior completado, mostrar opción de nuevo turno
+  const canStartNewShift = !registro && !!turnoAnterior;
 
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-[#FAF7F2] border border-[#EBE3D5] rounded-xl p-3 shadow-sm select-none">
       <div className="flex flex-col justify-center">
         <span className="text-[10px] text-[var(--color-text-muted)] uppercase tracking-wider font-bold">Registro de Asistencia</span>
         <div className="flex items-center gap-2 mt-0.5">
-          <span className={`w-2 h-2 rounded-full ${hasSalida ? 'bg-neutral-400' : hasEntrada ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+          <span className={`w-2 h-2 rounded-full ${hasSalida ? 'bg-neutral-400' : hasEntrada ? 'bg-emerald-500 animate-pulse' : canStartNewShift ? 'bg-amber-500' : 'bg-amber-500'}`} />
           <span className="text-xs font-semibold text-[var(--color-text-primary)]">
-            {hasSalida ? 'Jornada Completada' : hasEntrada ? 'Trabajando' : 'Fuera de Turno'}
+            {hasSalida ? 'Jornada Completada' : hasEntrada ? 'Trabajando' : canStartNewShift ? 'Turno Anterior Completado' : 'Fuera de Turno'}
           </span>
         </div>
       </div>
@@ -89,20 +94,20 @@ export default function AsistenciaControl({ usuario }) {
         <div>
           <span>Entrada: </span>
           <span className="font-bold text-[var(--color-text-primary)]">
-            {hasEntrada ? formatTime(registro.hora_entrada) : '--:--'}
+            {hasEntrada ? formatTime(registro.hora_entrada) : canStartNewShift ? formatTime(turnoAnterior.hora_entrada) : '--:--'}
           </span>
         </div>
         <div>
           <span>Salida: </span>
           <span className="font-bold text-[var(--color-text-primary)]">
-            {hasSalida ? formatTime(registro.hora_salida) : '--:--'}
+            {hasSalida ? formatTime(registro.hora_salida) : canStartNewShift ? formatTime(turnoAnterior.hora_salida) : '--:--'}
           </span>
         </div>
       </div>
 
       {/* Action buttons */}
       <div className="flex items-center gap-2">
-        {!hasEntrada && (
+        {!hasEntrada && !canStartNewShift && (
           <button
             onClick={() => registrarAsistencia('entrada')}
             disabled={procesando}
@@ -122,10 +127,17 @@ export default function AsistenciaControl({ usuario }) {
           </button>
         )}
 
-        {hasEntrada && hasSalida && (
-          <span className="text-[11px] text-emerald-600 bg-emerald-50 border border-emerald-200 py-1 px-2.5 rounded-lg font-bold">
-            Turno Finalizado
-          </span>
+        {canStartNewShift && (
+          <button
+            onClick={() => registrarAsistencia('entrada')}
+            disabled={procesando}
+            className="flex items-center gap-1.5 bg-[#4F3E35] hover:bg-[#3B2B24] text-white text-xs font-bold py-1.5 px-3 rounded-lg cursor-pointer transition-colors border-none disabled:opacity-50"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Iniciar Nuevo Turno
+          </button>
         )}
 
 

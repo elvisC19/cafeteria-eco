@@ -36,12 +36,24 @@ export const authAPI = {
 
 // ============ PRODUCTOS ============
 export const productosAPI = {
-  listar: (disponible = true) =>
-    apiFetch(`/api/productos?disponible=${disponible}`),
-  actualizarImagenUrl: (id_producto, imagen_url) =>
+  listar: (disponible) => {
+    const url = disponible !== undefined ? `/api/productos?disponible=${disponible}` : '/api/productos';
+    return apiFetch(url);
+  },
+  crear: (data) =>
+    apiFetch('/api/productos', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  actualizar: (data) =>
     apiFetch('/api/productos', {
       method: 'PATCH',
-      body: JSON.stringify({ id_producto, imagen_url }),
+      body: JSON.stringify(data),
+    }),
+  eliminar: (id_producto) =>
+    apiFetch('/api/productos', {
+      method: 'DELETE',
+      body: JSON.stringify({ id_producto }),
     }),
 };
 
@@ -84,10 +96,25 @@ export const pagosAPI = {
 // ============ INSUMOS ============
 export const insumosAPI = {
   listar: () => apiFetch('/api/insumos'),
-  reabastecer: (id_insumo, cantidad_agregar) =>
+  reabastecer: (id_insumo, cantidad_agregar, costo_unitario) =>
     apiFetch('/api/insumos', {
       method: 'PATCH',
-      body: JSON.stringify({ id_insumo, cantidad_agregar }),
+      body: JSON.stringify({ id_insumo, cantidad_agregar, costo_unitario }),
+    }),
+  crear: (data) =>
+    apiFetch('/api/insumos', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  actualizar: (data) =>
+    apiFetch('/api/insumos', {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+  eliminar: (id_insumo) =>
+    apiFetch('/api/insumos', {
+      method: 'DELETE',
+      body: JSON.stringify({ id_insumo }),
     }),
 };
 
@@ -109,6 +136,22 @@ export const usuariosAPI = {
 // ============ REPORTES ============
 export const reportesAPI = {
   ingresos: () => apiFetch('/api/reportes/ingresos'),
+};
+
+// ============ ALERTAS DE INVENTARIO ============
+export const alertasAPI = {
+  listar: (todas = false) =>
+    apiFetch(`/api/alertas${todas ? '?todas=true' : ''}`),
+  marcarLeida: (id_alerta) =>
+    apiFetch('/api/alertas', {
+      method: 'PATCH',
+      body: JSON.stringify({ id_alerta }),
+    }),
+  marcarTodasLeidas: () =>
+    apiFetch('/api/alertas', {
+      method: 'PATCH',
+      body: JSON.stringify({ marcar_todas: true }),
+    }),
 };
 
 // ============ ANALÍTICA — MÓDULO DE INTELIGENCIA ECONÓMICA ============

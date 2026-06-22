@@ -11,9 +11,53 @@ export default function AlmacenPage() {
   const [loading, setLoading] = useState(true);
   const [showReabastecer, setShowReabastecer] = useState(null);
   const [cantidadAgregar, setCantidadAgregar] = useState('');
+  const [costoUnitarioAgregar, setCostoUnitarioAgregar] = useState('');
+  const [costoTotalAgregar, setCostoTotalAgregar] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [filtro, setFiltro] = useState('todos');
+
+  const handleCantidadChange = (val, currentCostoUnitario) => {
+    setCantidadAgregar(val);
+    const qty = parseFloat(val);
+    const unitPrice = parseFloat(costoUnitarioAgregar) || parseFloat(currentCostoUnitario) || 0;
+    if (!isNaN(qty) && qty > 0) {
+      setCostoTotalAgregar((qty * unitPrice).toFixed(2));
+      if (!costoUnitarioAgregar) {
+        setCostoUnitarioAgregar(unitPrice.toFixed(4));
+      }
+    } else {
+      setCostoTotalAgregar('');
+    }
+  };
+
+  const handleCostoTotalChange = (val) => {
+    setCostoTotalAgregar(val);
+    const total = parseFloat(val);
+    const qty = parseFloat(cantidadAgregar);
+    if (!isNaN(total) && !isNaN(qty) && qty > 0) {
+      setCostoUnitarioAgregar((total / qty).toFixed(4));
+    } else if (isNaN(total)) {
+      setCostoUnitarioAgregar('');
+    }
+  };
+
+  const handleCostoUnitarioChange = (val) => {
+    setCostoUnitarioAgregar(val);
+    const unit = parseFloat(val);
+    const qty = parseFloat(cantidadAgregar);
+    if (!isNaN(unit) && !isNaN(qty) && qty > 0) {
+      setCostoTotalAgregar((qty * unit).toFixed(2));
+    } else if (isNaN(unit)) {
+      setCostoTotalAgregar('');
+    }
+  };
+
+  const resetRestockForm = () => {
+    setCantidadAgregar('');
+    setCostoTotalAgregar('');
+    setCostoUnitarioAgregar('');
+  };
 
   useEffect(() => { loadInsumos(); }, []);
 
@@ -35,10 +79,14 @@ export default function AlmacenPage() {
       return;
     }
     try {
-      const result = await insumosAPI.reabastecer(id_insumo, parseFloat(cantidadAgregar));
+      const result = await insumosAPI.reabastecer(
+        id_insumo,
+        parseFloat(cantidadAgregar),
+        costoUnitarioAgregar ? parseFloat(costoUnitarioAgregar) : undefined
+      );
       setSuccess(result.message);
       setShowReabastecer(null);
-      setCantidadAgregar('');
+      resetRestockForm();
       loadInsumos();
       setTimeout(() => setSuccess(''), 3000);
     } catch (err) {
@@ -195,26 +243,67 @@ export default function AlmacenPage() {
 
               {/* Restock */}
               {showReabastecer === insumo.id_insumo ? (
-                <div className="flex gap-2 animate-slide-up">
-                  <input
-                    type="number"
-                    step="0.01"
-                    className="input-field flex-1 text-sm"
-                    placeholder={`Cantidad en ${insumo.unidad_medida}`}
-                    value={cantidadAgregar}
-                    onChange={(e) => setCantidadAgregar(e.target.value)}
-                    autoFocus
-                  />
-                  <button onClick={() => reabastecer(insumo.id_insumo)} className="btn-primary text-sm px-4">
-                    Agregar
-                  </button>
-                  <button onClick={() => { setShowReabastecer(null); setCantidadAgregar(''); }} className="btn-secondary text-sm px-3">
-                    ✕
-                  </button>
+                <div className="bg-[var(--bg-secondary)] border border-[var(--color-border-warm)] rounded-xl p-3.5 space-y-3 mt-2 animate-slide-up">
+                  <p className="text-[11px] font-bold text-[var(--text-primary)]">Reabastecer Insumo</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="block text-[9px] font-bold text-[var(--text-muted)] uppercase mb-1">Cantidad</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        className="input-field text-xs !py-1 !px-2"
+                        placeholder={`En ${insumo.unidad_medida}`}
+                        value={cantidadAgregar}
+                        onChange={(e) => handleCantidadChange(e.target.value, insumo.costo_unitario)}
+                        autoFocus
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-bold text-[var(--text-muted)] uppercase mb-1">Costo Total (BOB)</label>
+                      <input
+                        type="number"
+                        step="0.01"
+                        className="input-field text-xs !py-1 !px-2"
+                        placeholder="0.00"
+                        value={costoTotalAgregar}
+                        onChange={(e) => handleCostoTotalChange(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[9px] font-bold text-[var(--text-muted)] uppercase mb-1">Costo Unit. (BOB)</label>
+                      <input
+                        type="number"
+                        step="0.0001"
+                        className="input-field text-xs !py-1 !px-2 font-mono"
+                        placeholder="0.00"
+                        value={costoUnitarioAgregar}
+                        onChange={(e) => handleCostoUnitarioChange(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-2 justify-end">
+                    <button
+                      onClick={() => { setShowReabastecer(null); resetRestockForm(); }}
+                      className="bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-[10px] font-bold py-1.5 px-3 rounded-lg border-none cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={() => reabastecer(insumo.id_insumo)}
+                      className="bg-[#3B2B24] hover:bg-[#4F3E35] text-white text-[10px] font-bold py-1.5 px-3 rounded-lg border-none cursor-pointer"
+                    >
+                      Confirmar
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <button
-                  onClick={() => { setShowReabastecer(insumo.id_insumo); setCantidadAgregar(''); }}
+                  onClick={() => {
+                    setShowReabastecer(insumo.id_insumo);
+                    setCantidadAgregar('');
+                    setCostoUnitarioAgregar(parseFloat(insumo.costo_unitario || 0).toFixed(4));
+                    setCostoTotalAgregar('');
+                  }}
                   className="btn-secondary w-full text-sm flex items-center justify-center gap-2"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
